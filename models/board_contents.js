@@ -4,69 +4,94 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    member_id: {
+    document_id: {
       type: DataTypes.INTEGER(20),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
       autoIncrement: true,
       comment: null,
-      field: "member_id"
+      field: "document_id"
     },
-    username: {
-      type: DataTypes.STRING(40),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "username"
-    },
-    nickname: {
-      type: DataTypes.STRING(40),
-      allowNull: false,
-      defaultValue: "",
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "nickname"
-    },
-    password: {
-      type: DataTypes.STRING(140),
+    board_category: {
+      type: DataTypes.INTEGER(20),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "password"
+      field: "board_category",
+      references: {
+        key: "document_id",
+        model: "board_contents_model"
+      }
     },
-    gender: {
-      type: DataTypes.STRING(1),
+    member_id: {
+      type: DataTypes.INTEGER(20),
       allowNull: true,
-      defaultValue: "",
+      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "gender"
+      field: "member_id",
+      references: {
+        key: "member_id",
+        model: "users_model"
+      }
     },
-    enabled: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: 1,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "enabled"
-    },
-    email: {
-      type: DataTypes.STRING(200),
+    title: {
+      type: DataTypes.STRING(250),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "email",
-      unique: "email"
+      field: "title"
+    },
+    content: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "content"
+    },
+    readed_count: {
+      type: DataTypes.INTEGER(20),
+      allowNull: false,
+      defaultValue: "0",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "readed_count"
+    },
+    voted_count: {
+      type: DataTypes.INTEGER(20),
+      allowNull: false,
+      defaultValue: "0",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "voted_count"
+    },
+    blamed_count: {
+      type: DataTypes.INTEGER(20),
+      allowNull: false,
+      defaultValue: "0",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "blamed_count"
+    },
+    comment_count: {
+      type: DataTypes.INTEGER(20),
+      allowNull: false,
+      defaultValue: "0",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "comment_count"
     },
     created_at: {
       type: DataTypes.DATE,
@@ -77,14 +102,14 @@ module.exports = sequelize => {
       comment: null,
       field: "created_at"
     },
-    withdraw_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
+    is_visible: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: 1,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "withdraw_at"
+      field: "is_visible"
     },
     last_updated_id: {
       type: DataTypes.INTEGER(20),
@@ -95,8 +120,8 @@ module.exports = sequelize => {
       comment: null,
       field: "last_updated_id",
       references: {
-        key: "member_id",
-        model: "users_model"
+        key: "document_id",
+        model: "board_contents_model"
       }
     },
     last_updated_ip: {
@@ -116,27 +141,28 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    type: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: 1,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "type"
     }
   };
   const options = {
-    tableName: "users",
+    tableName: "board_contents",
     comment: "",
     indexes: [{
+      name: "member_id",
+      unique: false,
+      type: "BTREE",
+      fields: ["member_id"]
+    }, {
       name: "last_updated_id",
       unique: false,
       type: "BTREE",
       fields: ["last_updated_id"]
+    }, {
+      name: "board_category",
+      unique: false,
+      type: "BTREE",
+      fields: ["board_category"]
     }]
   };
-  const UsersModel = sequelize.define("users_model", attributes, options);
-  return UsersModel;
+  const BoardContentsModel = sequelize.define("board_contents_model", attributes, options);
+  return BoardContentsModel;
 };
