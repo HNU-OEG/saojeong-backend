@@ -42,7 +42,6 @@ module.exports = sequelize => {
     title: {
       type: DataTypes.STRING(250),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -125,7 +124,7 @@ module.exports = sequelize => {
       }
     },
     last_updated_ip: {
-      type: varbinary(20),
+      type: 'varbinary(20)',
       allowNull: false,
       defaultValue: "0",
       primaryKey: false,

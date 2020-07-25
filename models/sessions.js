@@ -20,7 +20,6 @@ module.exports = sequelize => {
     session_key: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
       comment: null,
@@ -45,9 +44,8 @@ module.exports = sequelize => {
       field: "session_value"
     },
     session_ip: {
-      type: varbinary(20),
+      type: 'varbinary(20)',
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -64,6 +62,7 @@ module.exports = sequelize => {
     }
   };
   const options = {
+    timestamps: false,
     tableName: "sessions",
     comment: "",
     indexes: [{

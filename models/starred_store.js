@@ -59,6 +59,7 @@ module.exports = sequelize => {
     }
   };
   const options = {
+    timestamps: false,
     tableName: "starred_store",
     comment: "",
     indexes: [{

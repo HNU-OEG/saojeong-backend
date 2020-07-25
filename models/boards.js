@@ -16,7 +16,6 @@ module.exports = sequelize => {
     name: {
       type: DataTypes.STRING(40),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -50,7 +49,7 @@ module.exports = sequelize => {
       field: "removed_at"
     },
     ip_addr: {
-      type: varbinary(20),
+      type: 'varbinary(20)',
       allowNull: false,
       defaultValue: "0",
       primaryKey: false,
@@ -60,6 +59,7 @@ module.exports = sequelize => {
     }
   };
   const options = {
+    timestamps: false,
     tableName: "boards",
     comment: "",
     indexes: []

@@ -29,7 +29,6 @@ module.exports = sequelize => {
     start_hour: {
       type: DataTypes.TIME,
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -38,7 +37,6 @@ module.exports = sequelize => {
     end_hour: {
       type: DataTypes.TIME,
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,

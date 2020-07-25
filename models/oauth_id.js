@@ -20,7 +20,6 @@ module.exports = sequelize => {
     provider: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -29,7 +28,6 @@ module.exports = sequelize => {
     oauth_version: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -38,7 +36,6 @@ module.exports = sequelize => {
     access_token: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,

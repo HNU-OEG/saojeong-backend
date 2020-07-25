@@ -7,7 +7,6 @@ module.exports = sequelize => {
     store_id: {
       type: DataTypes.INTEGER(20),
       allowNull: false,
-      defaultValue: null,
       primaryKey: true,
       autoIncrement: true,
       comment: null,
@@ -16,7 +15,6 @@ module.exports = sequelize => {
     store_indexholder: {
       type: DataTypes.INTEGER(3),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -25,7 +23,6 @@ module.exports = sequelize => {
     store_name: {
       type: DataTypes.STRING(80),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -34,7 +31,6 @@ module.exports = sequelize => {
     store_type: {
       type: DataTypes.STRING(6),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -43,7 +39,6 @@ module.exports = sequelize => {
     store_master: {
       type: DataTypes.INTEGER(20),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -82,6 +77,7 @@ module.exports = sequelize => {
     }
   };
   const options = {
+    timestamps: false,
     tableName: "store_information",
     comment: "",
     indexes: [{

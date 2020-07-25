@@ -7,7 +7,6 @@ module.exports = sequelize => {
     merchandise_id: {
       type: DataTypes.INTEGER(20),
       allowNull: false,
-      defaultValue: null,
       primaryKey: true,
       autoIncrement: true,
       comment: null,
@@ -29,7 +28,6 @@ module.exports = sequelize => {
     name: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: "상품 이름",
@@ -38,7 +36,6 @@ module.exports = sequelize => {
     price: {
       type: DataTypes.INTEGER(8),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: "상품 가격",
@@ -72,7 +69,7 @@ module.exports = sequelize => {
       field: "removed_at"
     },
     last_updated_ip: {
-      type: varbinary(20),
+      type: 'varbinary(20)',
       allowNull: false,
       defaultValue: "0",
       primaryKey: false,
@@ -82,6 +79,7 @@ module.exports = sequelize => {
     }
   };
   const options = {
+    timestamps: false,
     tableName: "store_merchandise",
     comment: "",
     indexes: [{

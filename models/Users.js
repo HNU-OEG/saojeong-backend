@@ -7,7 +7,6 @@ module.exports = sequelize => {
     member_id: {
       type: DataTypes.INTEGER(20),
       allowNull: false,
-      defaultValue: null,
       primaryKey: true,
       autoIncrement: true,
       comment: null,
@@ -16,7 +15,6 @@ module.exports = sequelize => {
     username: {
       type: DataTypes.STRING(40),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -34,7 +32,6 @@ module.exports = sequelize => {
     password: {
       type: DataTypes.STRING(140),
       allowNull: true,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
@@ -61,22 +58,21 @@ module.exports = sequelize => {
     email: {
       type: DataTypes.STRING(200),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "email",
       unique: "email"
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: sequelize.fn('current_timestamp'),
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "created_at"
-    },
+    // created_at: {
+    //   type: DataTypes.DATE,
+    //   allowNull: false,
+    //   defaultValue: sequelize.fn('current_timestamp'),
+    //   primaryKey: false,
+    //   autoIncrement: false,
+    //   comment: null,
+    //   field: "created_at"
+    // },
     withdraw_at: {
       type: DataTypes.DATE,
       allowNull: true,
@@ -100,7 +96,7 @@ module.exports = sequelize => {
       }
     },
     last_updated_ip: {
-      type: varbinary(20),
+      type: 'varbinary(20)',
       allowNull: false,
       defaultValue: "0",
       primaryKey: false,
@@ -108,15 +104,15 @@ module.exports = sequelize => {
       comment: null,
       field: "last_updated_ip"
     },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "updated_at"
-    },
+    // updated_at: {
+    //   type: DataTypes.DATE,
+    //   allowNull: true,
+    //   defaultValue: null,
+    //   primaryKey: false,
+    //   autoIncrement: false,
+    //   comment: null,
+    //   field: "updated_at"
+    // },
     type: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

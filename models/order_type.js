@@ -16,7 +16,6 @@ module.exports = sequelize => {
     name: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: "제품 구입 수단",
@@ -55,6 +54,7 @@ module.exports = sequelize => {
     }
   };
   const options = {
+    timestamps: false,
     tableName: "order_type",
     comment: "",
     indexes: [{
