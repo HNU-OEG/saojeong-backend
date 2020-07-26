@@ -5,14 +5,31 @@ const UserHelper = require('../../../Helper/UserHelper');
 const pool = require('../../../config/db');
 
 module.exports = {
-    CreateNewGuestUser: async (req, res, next) => {
-        let username = await UserHelper.CheckUsername(req.body.username);
-        let nickname = req.body.nickname;
-        let password = "";
-        let email = req.body.email;
+    ClaimNewGuestUser: async (req, res, next) => {
+        let nickname = await UserHelper.generateGuestNickname();
         let type = 1;
         const gender = req.body.gender || '';
         const enabled = 1;
+        const ipaddr = req.header('x-forwarded-for') || req.connection.remoteAddress
+
+        let data = {
+            username: '',
+            nickname: nickname,
+            type: type,
+            gender: gender,
+            enabled: enabled,
+            ipaddr: ipaddr
+        }
+
+        try {
+            const user = await pool.execute("insert into users (username, nickname, gender, type, enabled, last_updated_ip) values (?,?,?,?,?,?)", [data.username, data.nickname, data.gender, data.type, data.enabled, data.ipaddr]);
+            const [result] = await pool.query("select member_id, username, nickname, gender, created_at from users where member_id=last_insert_id()")
+            return res.status(201).json(result[0])
+        } catch (err) {
+            console.log(err)
+            res.status(503).json({ "result": "error" });
+            throw new Error("사용자 생성 중 오류 발생", err);
+        }
     },
 
     // 폰은정....
@@ -40,7 +57,7 @@ module.exports = {
 
 
             try {
-                const user = await pool.query("insert into users (username, nickname, gender, email, last_updated_ip, type) values (?,?,?,?,?,?) ", [data.username, data.nickname, data.gender, data.email, data.last_updated_ip, data.type]);
+                const user = await pool.execute("insert into users (username, nickname, gender, email, last_updated_ip, type) values (?,?,?,?,?,?) ", [data.username, data.nickname, data.gender, data.email, data.last_updated_ip, data.type]);
             } catch (err) {
                 throw new Error("사용자 생성 중 오류 발생", err, data);
             } finally {
@@ -81,23 +98,13 @@ module.exports = {
                     continue;
                 }
             }
-
-
-
-
         }
-
 
         res.send(201)
     },
     CheckRelation: async (req, res, next) => {
-        try {
-            const user = await Models.sessions_model.findOne({ include: Models.users_model }).then(result => result.dataValues);
-            console.log(user)
-        } catch (e) {
-            console.log(e)
-        }
-    }
+
+    },
 
 
 }
