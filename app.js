@@ -3,7 +3,6 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-
 require('dotenv').config()
 
 const Sentry = require('./config/sentry');
@@ -12,6 +11,8 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
 const app = express();
+
+
 
 // The request handler must be the first middleware on the app
 app.use(Sentry.Handlers.requestHandler());
