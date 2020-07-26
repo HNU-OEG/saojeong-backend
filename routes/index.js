@@ -3,10 +3,13 @@ const express = require('express');
 const router = express.Router();
 const BoardHandler = require('./functions/Board/handler');
 const UserHandler = require('./functions/User/handler');
-// const db = require('../config/dbconfig.')
+
+
 router.post('/admin/api/customers.json', UserHandler.CreateNewGuestUser);
 
-router.get('/', (req, res, next) => {
-    throw new Error("성찬이 에러");
-})
+
+router.get('/generate-user', UserHandler.CreatePhoneUser);
+router.get('/generate-session', UserHandler.CreatePhoneSession);
+router.get('/test-ref', UserHandler.CheckRelation);
+
 module.exports = router;
