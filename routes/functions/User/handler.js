@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const faker = require('faker');
 const UserHelper = require('../../../Helper/UserHelper');
-const Models = require('../../../config/db');
+const pool = require('../../../config/db');
 
 module.exports = {
     CreateNewGuestUser: async (req, res, next) => {
@@ -18,38 +18,43 @@ module.exports = {
     // 폰은정....
     CreatePhoneUser: async (req, res, next) => {
         faker.locale = 'ko'
-        let name = faker.name.findName();
-        let nickname = faker.commerce.productName()
-        let gender = 1
-        let email = faker.internet.email();
-        let last_updated_ip = faker.internet.ip();
-        let type = 1;
+        for (let index = 0; index < 100; index++) {
+
+            let name = faker.name.findName();
+            let nickname = faker.commerce.productName()
+            let gender = 1
+            let email = faker.internet.email();
+            let last_updated_ip = faker.internet.ip();
+            let type = 1;
 
 
-        let data = {
-            username: name,
-            nickname: nickname,
-            gender: 1,
-            email: email,
-            last_updated_ip: last_updated_ip,
-            type: type
+            let data = {
+                username: name,
+                nickname: nickname,
+                gender: 1,
+                email: email,
+                last_updated_ip: last_updated_ip,
+                type: type
+            }
+
+
+
+            try {
+                const user = await pool.query("insert into users (username, nickname, gender, email, last_updated_ip, type) values (?,?,?,?,?,?) ", [data.username, data.nickname, data.gender, data.email, data.last_updated_ip, data.type]);
+            } catch (err) {
+                throw new Error("사용자 생성 중 오류 발생", err, data);
+            } finally {
+                continue;
+            }
+
+
         }
-
-
-
-        try {
-            const user = await Models.users_model.create(data)
-        } catch (err) {
-            throw new Error("사용자 생성 중 오류 발생", err, data);
-        }
-
-
 
         res.send(201)
     },
     CreatePhoneSession: async (req, res, next) => {
         faker.locale = 'ko'
-        for (let index = 12; index < 70; index++) {
+        for (let index = 1; index < 300; index++) {
             let member_id = index;
             let session_key = faker.random.number();
             let session_value = faker.random.uuid();
@@ -65,18 +70,20 @@ module.exports = {
                 last_updated: last_updated
             }
 
-            console.log(data)
-
-
-            try {
-                const session = await Models.sessions_model.create(data)
-                console.log(session)
-            } catch (err) {
-                console.log(err)
-                throw new Error("사용자 생성 중 오류 발생", err, data);
-            } finally {
-                continue;
+            if (await UserHelper.checkUserAvailablebyMemberID(data.member_id)) {
+                try {
+                    const session = await pool.execute("insert into sessions (member_id, session_key, session_value, session_ip, last_updated) values (?,?,?,?,?)", [data.member_id, data.session_key, data.session_value, data.session_ip, data.last_updated])
+                    console.log(session)
+                } catch (err) {
+                    console.log(err)
+                    throw new Error("사용자 생성 중 오류 발생", err, data);
+                } finally {
+                    continue;
+                }
             }
+
+
+
 
         }
 
