@@ -10,8 +10,6 @@ const Sentry = require('./config/sentry');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
-
-
 var passport = require('./config/passport');
 
 const app = express();
@@ -31,12 +29,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 app.use(passport.initialize());
 // passportConfig();
 
 // app.use(passport.session());
-
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
