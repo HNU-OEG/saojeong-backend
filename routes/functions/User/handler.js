@@ -72,7 +72,6 @@ module.exports = {
             try {
                 let user = await pool.execute("INSERT INTO users ( nickname, last_updated_id, last_updated_ip ) SELECT ?, ?, ? FROM users WHERE member_id = ?", [data.nickname, member_id, data.ip, member_id]);
                 const [result] = await pool.query("select member_id, username, nickname, gender, created_at from users where member_id=last_insert_id()")
-                console.log(user)
                 const token = jwt.sign(JSON.stringify(result[0]), process.env.JWT_SECRET);
                 console.log(token)
                 return res.json(201, { result, token })
