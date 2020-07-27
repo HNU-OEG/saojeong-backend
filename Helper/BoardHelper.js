@@ -184,18 +184,16 @@ module.exports = {
         /**
          * URI: [DELETE, /api/board/:category/content/:documentId]
          */
-        let CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' }
         let documentId = req.params.documentId;
         let isVisible = 0;
-        let lastUpdatedDate = CURRENT_TIMESTAMP;
         // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         let ip = faker.internet.ip();
 
         try {
             let query = await pool.query(
                 "UPDATE `board_contents` \
-                SET `is_visible` = ?, `last_updated_ip` = ?, `last_updated_date` = ? \
-                WHERE `document_id` = ?", [isVisible, ip, lastUpdatedDate, documentId]
+                SET `is_visible` = ?, `last_updated_ip` = ?, `last_updated_date` = CURRENT_TIMESTAMP() \
+                WHERE `document_id` = ?", [isVisible, ip, documentId]
             );
 
             let [response] = await pool.query(
