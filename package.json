@@ -17,10 +17,14 @@
     "hbs": "^4.1.1",
     "http-errors": "~1.6.3",
     "mariadb": "^2.4.2",
-    "method-override": "^3.0.0",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
     "eslint": "^7.5.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
