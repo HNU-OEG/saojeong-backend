@@ -26,10 +26,11 @@ router.get('/test-ref', UserHandler.CheckRelation);
 router.post('/api/board', BoardHelper.CreateBoard);
 
 // 게시글 관련
-router.get('/api/board/:category/content', BoardHelper.ReadAllBoardContent);
-router.get('/api/board/:category/content/:documentId', BoardHelper.ReadBoardContent);
+router.get('/api/board/:category/content', BoardHelper.GetAllBoardContentOrderByMethod);
+router.get('/api/board/:category/content/:documentId', BoardHelper.GetBoardContent);
 router.post('/api/board/:category/content', BoardHelper.CreateBoardContent);
 router.put('/api/board/:category/content/:documentId', BoardHelper.UpdateBoardContent);
 router.delete('/api/board/:category/content/:documentId', BoardHelper.DeleteBoardContent);
+router.patch('/api/board/:category/content/:documentId', BoardHelper.PatchBoardContentVoteOrBlame);
 
 module.exports = router;

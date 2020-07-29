@@ -28,14 +28,14 @@ module.exports = {
             );
 
             console.log("게시판 생성 완료: ", response[0]);
-            res.json(201, response[0]);
+            res.status(201).json(response[0]);
         } catch (e) {
-            res.send(503, e);
+            res.status(503).send(e);
             throw new Error("게시판 생성 중 오류 발생");
         }
     },
 
-    ReadBoardContent: async (req, res, next) => {
+    GetBoardContent: async (req, res, next) => {
         /**
          * URI: [GET, /api/board/:category/content/:documentId]
          * Response Body: {
@@ -48,6 +48,8 @@ module.exports = {
          * }
          */
 
+        let memberId = 18;
+        // let memberId = req.passport.user;
         let documentId = req.params.documentId;
 
         try {
@@ -59,43 +61,51 @@ module.exports = {
                 WHERE c.document_id = ?", [documentId]
             );
 
-            let query = await pool.query(
+            let readCountQuery = await pool.query(
                 "UPDATE `board_contents` \
                 SET `readed_count` = `readed_count` + 1 \
                 WHERE `document_id` = ?", [documentId]
             );
+
+            let readLogQuery = await pool.query(
+                "INSERT INTO  `board_read_log` (`member_id`, `document_id`) \
+                VALUES (?, ?)" [memberId, documentId]);
 
             console.log("게시글 조회 완료: ", response[0]);
             res.status(201).json(response[0]);
         } catch (e) {
-            res.send(503, e);
+            res.status(503).send(e);
             throw new Error("게시글 조회 중 오류 발생: ", e);
         }
     },
 
-    ReadAllBoardContent: async (req, res, next) => {
+    GetAllBoardContentOrderByMethod: async (req, res, next) => {
         /**
-         * URI: [POST, /api/board/:category/content/]
+         * URI: [GET, /api/board/:category/content/]
+         * Query String: ...?method=vote
+         * method={method}를 기준으로 DESC 정렬 리스트 리턴
+         * method가 없을 시 document_id를 기준으로 DESC 정렬 리턴
+         * Zeplin: 커뮤니티
          */
 
+
+        let orderBy = { undefined: "document_id", "vote": "voted_count" }
         let category = req.params.category;
+        let method = orderBy[req.query.method];
 
         try {
             let [response] = await pool.query(
-                "SELECT `title`, `title` AS `author`, DATE_FORMAT(c.created_at, '%m.%d %H:%i') AS `created_at`, `comment_count` \
-                FROM `boards_content`"
+                "SELECT `title`, `title` AS `author`, DATE_FORMAT(created_at, '%m.%d %H:%i') AS `created_at`, `comment_count` \
+                FROM `board_contents` \
+                WHERE `board_category` = ? AND `is_visible` = 1 \
+                ORDER BY ? DESC", [category, method]
             );
 
-            let query = await pool.query(
-                "UPDATE `board_contents` \
-                SET `readed_count` = `readed_count` + 1 \
-                WHERE `document_id` = ?", [documentId]
-            );
 
-            console.log("게시글 전체 조회 완료: ", response[0]);
+            console.log("게시글 전체 조회 완료: ", response);
             res.status(201).json(response[0]);
         } catch (e) {
-            res.send(503, e);
+            res.status(503).send(e);
             throw new Error("게시글 전체 조회 중 오류 발생: ", e);
         }
 
@@ -207,5 +217,38 @@ module.exports = {
             res.send(503, e);
             throw new Error("게시글 삭제 중 오류 발생: ", e);
         }
+    },
+
+    PatchBoardContentVoteOrBlame: async (req, res, next) => {
+        /**
+         * URI: [PATCH, /api/board/:category/content/:documentId]
+         * Query String: ...?type=[vote,blame]&task=[up,down]
+         */
+        let documentId = req.params.documentId;
+        let columnName = req.query.type === "vote" ? "voted_count" : "blamed_count"
+        let task = req.query.task === "up" ? "+ 1" : "- 1";
+
+        try {
+            let query = await pool.query(
+                "UPDATE `board_contents` \
+                SET `"+ columnName +"` = `" + columnName +"` " + task + " \
+                WHERE `document_id` = ?", [documentId]
+            );
+
+            // TODO: 좋아요 표시한 게시물 USER TABLE에 기록해야함
+
+            let [response] = await pool.query(
+                "SELECT * FROM `board_contents` \
+                WHERE `document_id` = ?", [documentId]
+            );
+
+            console.log("추천/비추천 업데이트 완료: ", response[0]);
+            res.status(201).json(response[0])
+        } catch (e) {
+            res.status(503).send(e);
+            throw new Error("추천/비추천 업데이트 중 오류 발생: ", e);
+        }
+
     }
 };
+
