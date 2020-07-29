@@ -5,7 +5,8 @@ const BoardHandler = require('./functions/Board/handler');
 const UserHandler = require('./functions/User/handler');
 
 const BoardHelper = require('../Helper/BoardHelper');
-const passport = require('../config/passport')
+const passport = require('../config/passport');
+const StoreHelper = require('../Helper/StoreHelper');
 
 // router.get('/users', passport.authenticate('jwt', {session: false}), UserController.index);
 // router.post('/auth/tokens', UserHandler.CreateJWTToken);
@@ -32,5 +33,11 @@ router.post('/api/board/:category/content', BoardHelper.CreateBoardContent);
 router.put('/api/board/:category/content/:documentId', BoardHelper.UpdateBoardContent);
 router.delete('/api/board/:category/content/:documentId', BoardHelper.DeleteBoardContent);
 router.patch('/api/board/:category/content/:documentId', BoardHelper.PatchBoardContentVoteOrBlame);
+
+// 점포 관련
+router.post('/api/store', StoreHelper.CreateStore);
+router.post('/api/store/time', StoreHelper.CreateStoreOpeningTime);
+router.post('/api/store/merchandise', StoreHelper.CreateStoreMerchandise);
+router.post('/api/store/telephone', StoreHelper.CreateStoreTelePhone);
 
 module.exports = router;
