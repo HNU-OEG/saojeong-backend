@@ -17,7 +17,7 @@ module.exports = {
         // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress; // localhost에서는 동작 안함
 
         try {
-            let query = await pool.query(
+            let query = await pool.execute(
                 "INSERT INTO `boards` (`name`, `ip_addr`) \
                 VALUES (?, ?) ", [name, ip]
             );
@@ -61,15 +61,15 @@ module.exports = {
                 WHERE c.document_id = ?", [documentId]
             );
 
-            let readCountQuery = await pool.query(
+            let readCountQuery = await pool.execute(
                 "UPDATE `board_contents` \
                 SET `readed_count` = `readed_count` + 1 \
                 WHERE `document_id` = ?", [documentId]
             );
 
-            let readLogQuery = await pool.query(
+            let readLogQuery = await pool.execute(
                 "INSERT INTO  `board_read_log` (`member_id`, `document_id`) \
-                VALUES (?, ?)" [memberId, documentId]);
+                VALUES (?, ?)", [memberId, documentId]);
 
             console.log("게시글 조회 완료: ", response[0]);
             res.status(201).json(response[0]);
@@ -131,7 +131,7 @@ module.exports = {
         let ip = faker.internet.ip();
 
         try {
-            let query = await pool.query(
+            let query = await pool.execute(
                 "INSERT INTO `board_contents` \
                 (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
                 VALUES (?, ?, ?, ?, ?) ", [boardCategory, memberId, title, content, ip]
@@ -171,7 +171,7 @@ module.exports = {
         let ip = faker.internet.ip();
 
         try {
-            let query = await pool.query(
+            let query = await pool.execute(
                 "INSERT INTO `board_contents` \
                 (`board_category`, `member_id`, `title`, `content`, `last_updated_ip`, `last_updated_id` ) \
                 VALUES (?, ?, ?, ?, ?, ?) ", [boardCategory, memberId, title, content, ip, documentId]
@@ -200,7 +200,7 @@ module.exports = {
         let ip = faker.internet.ip();
 
         try {
-            let query = await pool.query(
+            let query = await pool.execute(
                 "UPDATE `board_contents` \
                 SET `is_visible` = ?, `last_updated_ip` = ?, `last_updated_date` = CURRENT_TIMESTAMP() \
                 WHERE `document_id` = ?", [isVisible, ip, documentId]
@@ -229,7 +229,7 @@ module.exports = {
         let task = req.query.task === "up" ? "+ 1" : "- 1";
 
         try {
-            let query = await pool.query(
+            let query = await pool.execute(
                 "UPDATE `board_contents` \
                 SET `"+ columnName +"` = `" + columnName +"` " + task + " \
                 WHERE `document_id` = ?", [documentId]
