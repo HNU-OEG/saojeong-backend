@@ -39,5 +39,8 @@ router.post('/api/store', StoreHelper.CreateStore);
 router.post('/api/store/time', StoreHelper.CreateStoreOpeningTime);
 router.post('/api/store/merchandise', StoreHelper.CreateStoreMerchandise);
 router.post('/api/store/telephone', StoreHelper.CreateStoreTelePhone);
+router.post('/api/store/:storeId/votegrade', StoreHelper.CreateVoteGrade);
+router.put('/api/store/:storeId/votegrade', StoreHelper.UpdateVoteGrade);
+router.post('/api/ordertype', StoreHelper.CreateOderType);
 
 module.exports = router;

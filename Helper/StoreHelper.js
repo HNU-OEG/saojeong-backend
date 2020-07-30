@@ -131,5 +131,108 @@ module.exports = {
             res.status(503).send(e);
             throw new Error("상품 등록 중 오류 발생");
         }
-    }
+    },
+
+    CreateVoteGrade: async (req, res, next) => {
+        /**
+         * URI: [POST, /api/store/:storeId/votegrade]
+         */
+        let storeId = req.params.storeId;
+        let memberId = 18;
+        let grade1 = 4.5;
+        let grade2 = 4.5;
+        let grade3 = 4.5;
+
+        try {
+
+            let query = await pool.execute(
+                "INSERT INTO `store_vote_grade` \
+                    (`store_id`, `member_id`, `question1`, `question2`, `question3`) \
+                    VALUES (?, ?, ?, ?, ?)", [storeId, memberId, grade1, grade2, grade3]
+            );
+
+            let [response] = await pool.query(
+                "SELECT * FROM `store_vote_grade` \
+                WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1", [memberId, storeId]
+            );
+
+            console.log("평점 등록 완료: ", response[0]);
+            res.status(201).json(response)[0];
+        } catch (e) {
+            res.status(503).send(e);
+            throw new Error("평점 등록 중 오류 발생");
+        }
+    },
+    UpdateVoteGrade: async (req, res, next) => {
+        /**
+         * URI: [PUT, /api/store/:storeId/votegrade]
+         */
+
+        let storeId = req.params.storeId;
+        let memberId = 18;
+        let grade1 = 4.5;
+        let grade2 = 4.5;
+        let grade3 = 4.5;
+
+        try {
+
+            let removeVoteGrade = await pool.execute(
+                "UPDATE `store_vote_grade` \
+                SET `removed_at` = CURRENT_TIMESTAMP(), `is_available` = 0 \
+                WHERE `member_id` = ? AND `store_id` = ? AND `is_available` = 1", [memberId, storeId]
+            );
+
+            let createVoteGrade = await pool.execute(
+                "INSERT INTO `store_vote_grade` \
+                (`store_id`, `member_id`, `question1`, `question2`, `question3`) \
+                VALUES (?, ?, ?, ?, ?)", [storeId, memberId, grade1, grade2, grade3]
+            );
+
+            let [response] = await pool.query(
+                "SELECT * FROM `store_vote_grade` \
+                WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1", [memberId, storeId]
+            );
+
+            console.log("평점 수정 완료: ", response[0]);
+            res.status(201).json(response)[0];
+        } catch (e) {
+            res.status(503).send(e);
+            throw new Error("평점 수정 중 오류 발생");
+        }
+    },
+
+    CreateOderType: async (req, res, next) => {
+        /**
+         * URI: [PUT, /api/ordertype?name=]
+         */
+
+
+        // let author = req.params.memberId
+        let name = req.body;
+        let author = 18;
+        let sql = "INSERT INTO `order_type` (`name`, `author`) VALUES "
+
+        let valueList = []
+        for (let row in name) {
+            valueList.push("('" + name[row] + "', " + author + ")");
+        }
+        sql += valueList.join(", ");
+        console.log(sql);
+        try {
+
+            let insertQuery = await pool.execute(sql);
+
+            let [response] = await pool.query(
+                "SELECT * FROM `order_type` \
+                WHERE `ordertype_id`= last_insert_id()"
+            );
+
+            console.log("거래방식 생성 완료: ", response[0]);
+            res.status(201).json(response)[0];
+        } catch (e) {
+            res.status(503).send(e);
+            throw new Error("거래방식 생성 중 오류 발생");
+        }
+
+    },
 }
