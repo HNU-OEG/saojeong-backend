@@ -27,14 +27,15 @@ require('dotenv').config();
 //JWT Strategy
 passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET
+    secretOrKey: process.env.JWT_SECRET,
+    issuer: 'team.Ojeongdong.Economics.Guardians'
 },
     async function (jwtPayload, done) {
         console.log("jwt payload ==> ", jwtPayload)
+
         try {
             let [result] = await pool.query("select member_id, type from users where member_id = ?", [jwtPayload.member_id])
             if (result[0].member_id == jwtPayload.member_id) {
-                console.log(result);
                 var PayLoad = {
                     member_id: result[0].member_id,
                     usertype: result[0].type,
@@ -42,11 +43,11 @@ passport.use(new JWTStrategy({
                 return done(null, PayLoad);
             } else {
                 console.log("페이로드가 안맞습니다. 인증 상태가 다른 상태에서 인증받으려 하고 있읍니다.")
-                return done(err);
+                return done(null, false);
             }
         } catch (err) {
             console.log(err)
-            return done(err);
+            return done(null, false);
         }
     }
 ));
