@@ -1,4 +1,4 @@
-var mysql = require('mysql2/promise');
+var mysql = require('mysql2/promise')
 require('dotenv').config()
 var pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -7,20 +7,20 @@ var pool = mysql.createPool({
   database: process.env.DB_DATABASE,
   port: process.env.DB_PORT,
   connectionLimit: process.env.DB_CONNECTIONLIMIT,
-});
+})
 
 const dbTest = async () => {
   try {
-    const row = await pool.query('select 1 + 1');
-    console.log("Successfully DB Connection");
-    return row;
+    const row = await pool.query('select 1 + 1')
+    console.log('Successfully DB Connection')
+    return row
   } catch (err) {
-    console.log("Error : ", err);
-    return false;
+    console.log('Error : ', err)
+    return false
   }
 }
 
-dbTest();
+dbTest()
 // pool.getConnection(function(err, connection) {
 //     if (err) throw err; // not connected!
 
@@ -38,4 +38,4 @@ dbTest();
 
 
 
-module.exports = pool;
+module.exports = pool

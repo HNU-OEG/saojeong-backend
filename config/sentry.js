@@ -1,5 +1,5 @@
-const Sentry = require('@sentry/node');
+const Sentry = require('@sentry/node')
 
-Sentry.init({ dsn: process.env.SENTRY_TRACKING_URL });
+Sentry.init({ dsn: process.env.SENTRY_TRACKING_URL })
 
-module.exports = Sentry;
+module.exports = Sentry
