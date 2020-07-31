@@ -235,4 +235,38 @@ module.exports = {
         }
 
     },
+
+    MappingOrderTypeToStore: async (req, res, next) => {
+        /**
+         * URI: [POST, /api/store/:storeId/ordertype]
+         */
+
+
+        // let author = req.params.memberId
+        let orderType = req.body;
+        let storeId = req.params.storeId;
+        let sql = "INSERT INTO `store_to_ordertype` (`store_id`, `ordertype_id`) VALUES "
+
+        let valueList = []
+        for (let row in orderType) {
+            valueList.push("('" + storeId + "', (SELECT `ordertype_id` FROM `order_type` WHERE `name` = '" + orderType[row] + "'))");
+        }
+        sql += valueList.join(", ");
+        console.log(sql);
+        try {
+
+            let insertQuery = await pool.execute(sql);
+
+            let [response] = await pool.query(
+                "SELECT * FROM `order_type` \
+                WHERE `ordertype_id`= last_insert_id()"
+            );
+
+            console.log("거래방식 생성 완료: ", response[0]);
+            res.status(201).json(response)[0];
+        } catch (e) {
+            res.status(503).send(e);
+            throw new Error("거래방식 생성 중 오류 발생");
+        }
+    },
 }

@@ -42,5 +42,6 @@ router.post('/api/store/telephone', StoreHelper.CreateStoreTelePhone);
 router.post('/api/store/:storeId/votegrade', StoreHelper.CreateVoteGrade);
 router.put('/api/store/:storeId/votegrade', StoreHelper.UpdateVoteGrade);
 router.post('/api/ordertype', StoreHelper.CreateOderType);
+router.post('/api/store/:storeId/ordertype', StoreHelper.MappingOrderTypeToStore);
 
 module.exports = router;
