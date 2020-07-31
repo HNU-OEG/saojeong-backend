@@ -143,5 +143,17 @@ module.exports = {
       console.log(err)
       return false
     }
+  },
+  checkUserNickname: async (member_id) => {
+    try {
+      let [username] = await pool.query('select member_id, nickname from users where member_id = ?', [member_id])
+      if (username.length == 1) {
+        return username[0].nickname
+      } else {
+        return false
+      }
+    } catch (err) {
+      throw new Error('User Nickname 조회에 실패했습니다.')
+    }
   }
 }

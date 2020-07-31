@@ -43,4 +43,6 @@ router.put('/api/board/:category/content/:documentId', BoardHelper.UpdateBoardCo
 router.delete('/api/board/:category/content/:documentId', BoardHelper.DeleteBoardContent)
 router.patch('/api/board/:category/content/:documentId', BoardHelper.PatchBoardContentVoteOrBlame)
 
+// 게시물 댓글 관련
+router.put('/api/board/:category/content/:documentId/comment/new', BoardHandler.PostNewComment)
 module.exports = router
