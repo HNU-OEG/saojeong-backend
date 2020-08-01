@@ -3,9 +3,9 @@ const express = require('express')
 const router = express.Router()
 const BoardHandler = require('./functions/Board/handler')
 const UserHandler = require('./functions/User/handler')
-
-const BoardHelper = require('../Helper/BoardHelper')
 const passport = require('../config/passport')
+const BoardHelper = require('../Helper/BoardHelper')
+const StoreHelper = require('../Helper/StoreHelper')
 
 // router.get('/users', passport.authenticate('jwt', {session: false}), UserController.index);
 // router.post('/auth/tokens', UserHandler.CreateJWTToken);
