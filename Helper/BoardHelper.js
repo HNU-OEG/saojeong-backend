@@ -111,42 +111,33 @@ module.exports = {
 
   },
 
-  CreateBoardContent: async (req, res, next) => {
-    /**
-     * URI: [POST, /api/board/:category/content]
-     * Request Body: {
-     *   "member_id": 1,
-     *   "content": {
-     *     "title": "TEST01",
-     *     "content": "TEST0001"
-     *     }
-     *   }
-     */
-
-    let memberId = req.body.member_id
-    let boardCategory = req.params.category
-    let title = req.body.content.title
-    let content = req.body.content.content
-    // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    let ip = faker.internet.ip()
-
+  createBoardContent: async (data) => {
     try {
-      let query = await pool.execute(
+      let writePost = await pool.execute(
         'INSERT INTO `board_contents` \
-                (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
-                VALUES (?, ?, ?, ?, ?) ', [boardCategory, memberId, title, content, ip]
+        (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
+        VALUES (?, ?, ?, ?, ?) ', [data.board_category, data.member_id, data.title, data.content, data.ip]
       )
 
-      let [response] = await pool.query(
+      let [checkWritingPost] = await pool.query(
         'SELECT * FROM `board_contents` \
-                WHERE `document_id`= last_insert_id()'
+        WHERE `document_id`= last_insert_id()'
       )
 
-      console.log('게시글 생성 완료: ', response[0])
-      res.status(201).json(response[0])
+      console.log('게시글 생성 완료\n', checkWritingPost[0])
+      return checkWritingPost[0]
     } catch (e) {
-      res.send(503, e)
-      throw new Error('게시글 생성 중 오류 발생: ', e)
+      throw new Error('게시글 생성 중 오류 발생\n', e)
+    }
+  },
+  getWritePostDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'board_category': req.params.category,
+      'title': req.body.title,
+      'content': req.body.article,
+      // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      'ip': faker.internet.ip(),
     }
   },
 
