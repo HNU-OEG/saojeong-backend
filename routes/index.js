@@ -35,18 +35,6 @@ router.get('/generate-session', UserHandler.CreatePhoneSession)
 // 게시판 관련
 router.post('/api/board', BoardHelper.CreateBoard)
 
-// 점포 관련
-router.post('/api/store', StoreHelper.CreateStore)
-router.post('/api/store/time', StoreHelper.CreateStoreOpeningTime)
-router.post('/api/store/merchandise', StoreHelper.CreateStoreMerchandise)
-router.post('/api/store/telephone', StoreHelper.CreateStoreTelePhone)
-router.post('/api/store/:storeId/votegrade', StoreHelper.CreateVoteGrade)
-router.put('/api/store/:storeId/votegrade', StoreHelper.UpdateVoteGrade)
-router.post('/api/ordertype', StoreHelper.CreateOderType)
-router.post('/api/store/:storeId/ordertype', StoreHelper.MappingOrderTypeToStore)
-router.post('/api/store/:storeId/star', StoreHelper.CreateStarredStore)
-router.delete('/api/store/:storeId/star', StoreHelper.DeleteStarredStore)
-
 // 게시글 관련
 router.get('/api/board/:category/content', BoardHelper.GetAllBoardContentOrderByMethod)
 router.get('/api/board/:category/content/:documentId', BoardHelper.GetBoardContent)
