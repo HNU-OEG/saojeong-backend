@@ -4,9 +4,8 @@ const router = express.Router()
 const BoardHandler = require('./functions/Board/handler')
 const UserHandler = require('./functions/User/handler')
 const passport = require('../config/passport')
-const BoardHelper = require('../Helper/BoardHelper');
-const passport = require('../config/passport');
-const StoreHelper = require('../Helper/StoreHelper');
+const BoardHelper = require('../Helper/BoardHelper')
+const StoreHelper = require('../Helper/StoreHelper')
 
 // router.get('/users', passport.authenticate('jwt', {session: false}), UserController.index);
 // router.post('/auth/tokens', UserHandler.CreateJWTToken);
@@ -37,14 +36,16 @@ router.get('/generate-session', UserHandler.CreatePhoneSession)
 router.post('/api/board', BoardHelper.CreateBoard)
 
 // 점포 관련
-router.post('/api/store', StoreHelper.CreateStore);
-router.post('/api/store/time', StoreHelper.CreateStoreOpeningTime);
-router.post('/api/store/merchandise', StoreHelper.CreateStoreMerchandise);
-router.post('/api/store/telephone', StoreHelper.CreateStoreTelePhone);
-router.post('/api/store/:storeId/votegrade', StoreHelper.CreateVoteGrade);
-router.put('/api/store/:storeId/votegrade', StoreHelper.UpdateVoteGrade);
-router.post('/api/ordertype', StoreHelper.CreateOderType);
-router.post('/api/store/:storeId/ordertype', StoreHelper.MappingOrderTypeToStore);
+router.post('/api/store', StoreHelper.CreateStore)
+router.post('/api/store/time', StoreHelper.CreateStoreOpeningTime)
+router.post('/api/store/merchandise', StoreHelper.CreateStoreMerchandise)
+router.post('/api/store/telephone', StoreHelper.CreateStoreTelePhone)
+router.post('/api/store/:storeId/votegrade', StoreHelper.CreateVoteGrade)
+router.put('/api/store/:storeId/votegrade', StoreHelper.UpdateVoteGrade)
+router.post('/api/ordertype', StoreHelper.CreateOderType)
+router.post('/api/store/:storeId/ordertype', StoreHelper.MappingOrderTypeToStore)
+router.post('/api/store/:storeId/star', StoreHelper.CreateStarredStore)
+router.delete('/api/store/:storeId/star', StoreHelper.DeleteStarredStore)
 
 // 게시글 관련
 router.get('/api/board/:category/content', BoardHelper.GetAllBoardContentOrderByMethod)

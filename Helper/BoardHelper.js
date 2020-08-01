@@ -6,11 +6,11 @@ module.exports = {
   // CheckUsername:
   CreateBoard: async (req, res, next) => {
     /**
-             *  URI: [POST, /api/board]
-             *  Request Body: {
-             *    "name": "OO게시판"
-             *  }
-             */
+      *  URI: [POST, /api/board]
+      *  Request Body: {
+      *    "name": "OO게시판"
+      *  }
+      */
 
     let name = req.body.name
     let ip = faker.internet.ip()
@@ -37,16 +37,16 @@ module.exports = {
 
   GetBoardContent: async (req, res, next) => {
     /**
-             * URI: [GET, /api/board/:category/content/:documentId]
-             * Response Body: {
-             *   "document_id": :documentId,
-             *   "title": "TEST01",
-             *   "content": "TEST0001",
-             *   "created_at": "07.26 09:25",
-             *   "category": "공지사항"
-             *   "author": "Intelligent Metal Sausages"
-             * }
-             */
+      * URI: [GET, /api/board/:category/content/:documentId]
+      * Response Body: {
+      *   "document_id": :documentId,
+      *   "title": "TEST01",
+      *   "content": "TEST0001",
+      *   "created_at": "07.26 09:25",
+      *   "category": "공지사항"
+      *   "author": "Intelligent Metal Sausages"
+      * }
+      */
 
     let memberId = 18
     // let memberId = req.passport.user;
@@ -81,12 +81,12 @@ module.exports = {
 
   GetAllBoardContentOrderByMethod: async (req, res, next) => {
     /**
-             * URI: [GET, /api/board/:category/content/]
-             * Query String: ...?method=vote
-             * method={method}를 기준으로 DESC 정렬 리스트 리턴
-             * method가 없을 시 document_id를 기준으로 DESC 정렬 리턴
-             * Zeplin: 커뮤니티
-             */
+      * URI: [GET, /api/board/:category/content/]
+      * Query String: ...?method=vote
+      * method={method}를 기준으로 DESC 정렬 리스트 리턴
+      * method가 없을 시 document_id를 기준으로 DESC 정렬 리턴
+      * Zeplin: 커뮤니티
+      */
 
 
     let orderBy = { undefined: 'document_id', 'vote': 'voted_count' }
@@ -113,15 +113,15 @@ module.exports = {
 
   CreateBoardContent: async (req, res, next) => {
     /**
-             * URI: [POST, /api/board/:category/content]
-             * Request Body: {
-             *   "member_id": 1,
-             *   "content": {
-             *     "title": "TEST01",
-             *     "content": "TEST0001"
-             *     }
-             *   }
-             */
+      * URI: [POST, /api/board/:category/content]
+      * Request Body: {
+      *   "member_id": 1,
+      *   "content": {
+      *     "title": "TEST01",
+      *     "content": "TEST0001"
+      *     }
+      *   }
+      */
 
     let memberId = req.body.member_id
     let boardCategory = req.params.category
@@ -152,15 +152,15 @@ module.exports = {
 
   UpdateBoardContent: async (req, res, next) => {
     /**
-             * URI: [PUT, /api/board/:category/content/:documentId]
-             * Request Body: {
-             *   "member_id": 1,
-             *   "content": {
-             *     "title": "title",
-             *     "content": "content"
-             *   }
-             * }
-             */
+      * URI: [PUT, /api/board/:category/content/:documentId]
+      * Request Body: {
+      *   "member_id": 1,
+      *   "content": {
+      *     "title": "title",
+      *     "content": "content"
+      *   }
+      * }
+      */
 
     let memberId = req.body.member_id
     let boardCategory = req.params.category
@@ -192,8 +192,8 @@ module.exports = {
 
   DeleteBoardContent: async (req, res, next) => {
     /**
-             * URI: [DELETE, /api/board/:category/content/:documentId]
-             */
+      * URI: [DELETE, /api/board/:category/content/:documentId]
+      */
     let documentId = req.params.documentId
     let isVisible = 0
     // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -221,9 +221,9 @@ module.exports = {
 
   PatchBoardContentVoteOrBlame: async (req, res, next) => {
     /**
-             * URI: [PATCH, /api/board/:category/content/:documentId]
-             * Query String: ...?type=[vote,blame]&task=[up,down]
-             */
+      * URI: [PATCH, /api/board/:category/content/:documentId]
+      * Query String: ...?type=[vote,blame]&task=[up,down]
+      */
     let documentId = req.params.documentId
     let columnName = req.query.type === 'vote' ? 'voted_count' : 'blamed_count'
     let task = req.query.task === 'up' ? '+ 1' : '- 1'
@@ -231,8 +231,8 @@ module.exports = {
     try {
       let query = await pool.query(
         'UPDATE `board_contents` \
-                SET `'+ columnName + '` = `' + columnName + '` ' + task + ' \
-                WHERE `document_id` = ?', [documentId]
+        SET `'+ columnName + '` = `' + columnName + '` ' + task + ' \
+        WHERE `document_id` = ?', [documentId]
       )
 
       // TODO: 좋아요 표시한 게시물 USER TABLE에 기록해야함
@@ -249,6 +249,6 @@ module.exports = {
       throw new Error('추천/비추천 업데이트 중 오류 발생: ', e)
     }
 
-  }
+  },
 }
 
