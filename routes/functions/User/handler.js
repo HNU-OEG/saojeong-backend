@@ -201,14 +201,18 @@ module.exports = {
 
     } else {
       try {
+        let revoke_oauth = await UserHelper.RevokeUserOAuthStatus(req.user.member_id)
+        let change_status = await UserHelper.RemoveUser(req.user.member_id)
 
+        return res.status(404).json({
+          'status': 'Removed User.'
+        })
+      } catch (err) {
+        return res.status(401).json({
+          'errors': 'Error processing customer Sorry!'
+        })
       }
-      let revoke_oauth = await UserHelper.RevokeUserOAuthStatus(req.user.member_id)
-      let change_status = await UserHelper.RemoveUser(req.user.member_id)
 
-      return res.status(404).json({
-        'status': 'Removed User.'
-      })
     }
   },
 }
