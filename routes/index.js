@@ -34,13 +34,13 @@ router.get('/generate-session', UserHandler.CreatePhoneSession)
 // 게시판 관련
 router.post('/api/board', BoardHelper.CreateBoard)
 
-// 게시글 관련
-router.get('/api/board/:category/content', BoardHelper.GetAllBoardContentOrderByMethod)
-router.get('/api/board/:category/content/:documentId', BoardHelper.GetBoardContent)
-router.post('/api/board/:category/content', BoardHelper.CreateBoardContent)
-router.put('/api/board/:category/content/:documentId', BoardHelper.UpdateBoardContent)
-router.delete('/api/board/:category/content/:documentId', BoardHelper.DeleteBoardContent)
-router.patch('/api/board/:category/content/:documentId', BoardHelper.PatchBoardContentVoteOrBlame)
+// // 게시글 관련
+// router.get('/api/board/:category/content', BoardHelper.GetAllBoardContentOrderByMethod)
+// router.get('/api/board/:category/content/:documentId', BoardHelper.GetBoardContent)
+// router.post('/api/board/:category/content', BoardHelper.CreateBoardContent)
+// router.put('/api/board/:category/content/:documentId', BoardHelper.UpdateBoardContent)
+// router.delete('/api/board/:category/content/:documentId', BoardHelper.DeleteBoardContent)
+// router.patch('/api/board/:category/content/:documentId', BoardHelper.PatchBoardContentVoteOrBlame)
 
 // 게시물 댓글 관련
 router.put('/api/board/:category/content/:documentId/comment/:pastCommentId?/new', passport.authenticate('jwt', { session: false }), BoardHandler.PostNewComment)
