@@ -5,6 +5,7 @@ const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
 const jwt = require('jsonwebtoken')
 const passport = require('../../../config/passport')
+const randToken = require('rand-token')
 
 module.exports = {
   ClaimNewGuestUser: async (req, res, next) => {
@@ -15,6 +16,7 @@ module.exports = {
     const ipaddr = req.header('x-forwarded-for') || req.connection.remoteAddress
 
     let data = {
+      id: randToken.suid(20),
       username: '',
       nickname: nickname,
       type: type,
@@ -24,9 +26,10 @@ module.exports = {
     }
 
     try {
-      const user = await pool.execute('insert into users (username, nickname, gender, type, enabled, last_updated_ip) values (?,?,?,?,?,?)', [data.username, data.nickname, data.gender, data.type, data.enabled, data.ipaddr])
-      const [result] = await pool.query('select member_id, username, nickname, gender, created_at, type from users where member_id=last_insert_id()')
+      const user = await pool.execute('insert into users (member_id, username, nickname, gender, type, enabled, last_updated_ip) values (?,?,?,?,?,?,?)', [data.id, data.username, data.nickname, data.gender, data.type, data.enabled, data.ipaddr])
+      const [result] = await pool.query('select id, member_id, username, nickname, gender, created_at, type from users where id=last_insert_id()')
       let jwtpayload_data = {
+        reference_id: result[0].id,
         member_id: result[0].member_id,
         nickname: result[0].nickname,
         usertype: result[0].type
@@ -45,24 +48,24 @@ module.exports = {
     let member_id = req.params.member_id // 파라미터의 사용자 id
     let auth_member_id = req.user.member_id // jwt의 사용자 id
 
-    if (!member_id == auth_member_id) {
+    if (member_id !== auth_member_id) {
       return res.status(401).json({ 'result': 'error', 'message': '인증되지 않은 사용자입니다.' })
     } else {
       let nickname = req.body.nickname
       let userphoto = req.body.userphoto
       const ipaddr = req.header('x-forwarded-for') || req.connection.remoteAddress
       var data = {
+        member_id: member_id,
         nickname: nickname,
         userphoto: userphoto,
         ip: ipaddr
       }
 
       try {
-        let user = await pool.execute('INSERT INTO users ( nickname, last_updated_id, last_updated_ip ) SELECT ?, ?, ? FROM users WHERE member_id = ?', [data.nickname, member_id, data.ip, member_id])
-        const [result] = await pool.query('select member_id, username, nickname, gender, created_at from users where member_id=last_insert_id()')
-        const token = jwt.sign(JSON.stringify(result[0]), process.env.JWT_SECRET)
-        console.log(token)
-        return res.json(201, { result, token })
+        let user = await pool.execute('update users set nickname = ?, last_updated_ip = ? WHERE member_id = ?', [data.nickname, data.ip, data.member_id])
+        const [result] = await pool.query('select member_id, username, nickname, gender, created_at from users where member_id = ?', [data.member_id])
+        const token = await UserHelper.claimAccessTokenByMemberId(member_id)
+        return res.status(200).json({ result, token })
       } catch (err) {
         console.log(err)
         res.status(503).json({ 'result': 'error' })
@@ -156,7 +159,7 @@ module.exports = {
           console.log('만료까지 ', Math.floor(expirationDate - (new Date() / 1000)), '초 남음.')
 
           if ((expirationDate - new Date()) > 60000) {
-            return res.status(201).json({ 'accessToken': access_token })
+            return res.status(200).json({ 'accessToken': access_token })
           } else {
             let refreshPayload = {
               member_id: pl.member_id,
@@ -197,12 +200,19 @@ module.exports = {
       })
 
     } else {
-      let revoke_oauth = await UserHelper.RevokeUserOAuthStatus(req.user.member_id)
-      let change_status = await UserHelper.RemoveUser(req.user.member_id)
+      try {
+        let revoke_oauth = await UserHelper.RevokeUserOAuthStatus(req.user.member_id)
+        let change_status = await UserHelper.RemoveUser(req.user.member_id)
 
-      return res.status(404).json({
-        'status': 'Removed User.'
-      })
+        return res.status(404).json({
+          'status': 'Removed User.'
+        })
+      } catch (err) {
+        return res.status(401).json({
+          'errors': 'Error processing customer Sorry!'
+        })
+      }
+
     }
   },
 }

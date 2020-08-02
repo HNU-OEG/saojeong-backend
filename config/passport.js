@@ -29,8 +29,7 @@ passport.use(new JWTStrategy({
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT_SECRET,
   issuer: 'team.Ojeongdong.Economics.Guardians'
-},
-async function (jwtPayload, done) {
+}, async function (jwtPayload, done) {
   console.log('jwt payload ==> ', jwtPayload)
 
   try {
