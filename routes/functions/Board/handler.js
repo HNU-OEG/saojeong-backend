@@ -143,5 +143,23 @@ module.exports = {
         throw new Error('댓글을 삭제할 수 없습니다.')
       }
     }
+  },
+  SearchBoard: async (req, res, next) => {
+    let type = req.query.type
+    let query = req.query.value
+
+    let variable = '%${query}%'
+
+    if (type == 'board') {
+      try {
+        let [result] = await pool.query('SELECT board_contents.title, board_contents.content, board_contents.created_at FROM boards, board_contents, board_comments WHERE boards.board_id = board_contents.board_category AND board_contents.document_id = board_comments.`document_id` AND (board_contents.content LIKE ? OR board_comments.`comment_content` LIKE ?) GROUP BY board_contents.document_id', [variable, variable])
+        if (result.length == 0) {
+          return res.status(200).json({ 'result': '조건에 맞는 결과가 없습니다.' })
+        }
+        return res.status(200).json({ result: result })
+      } catch (err) {
+        throw new Error('게시판을 검색할 수 없습니다.')
+      }
+    }
   }
 }
