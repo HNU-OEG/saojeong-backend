@@ -44,5 +44,7 @@ router.delete('/api/board/:category/content/:documentId', BoardHelper.DeleteBoar
 router.patch('/api/board/:category/content/:documentId', BoardHelper.PatchBoardContentVoteOrBlame)
 
 // 게시물 댓글 관련
-router.put('/api/board/:category/content/:documentId/comment/new', BoardHandler.PostNewComment)
+router.put('/api/board/:category/content/:documentId/comment/:pastCommentId?/new', passport.authenticate('jwt', { session: false }), BoardHandler.PostNewComment)
+router.patch('/api/board/:category/content/:documentId/comment/:commentId', passport.authenticate('jwt', { session: false }), BoardHandler.EditComment)
+router.delete('/api/board/:category/content/:documentId/comment/:commentId', passport.authenticate('jwt', { session: false }), BoardHandler.RemoveComment)
 module.exports = router
