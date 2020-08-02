@@ -148,6 +148,10 @@ module.exports = {
     let type = req.query.type
     let query = req.query.value
 
+    if (query.length <= 2) {
+      return res.status(200).json({ 'result': '검색어는 최소 3자리부터 입력해야 합니다.' })
+    }
+
     let variable = '%${query}%'
 
     if (type == 'board') {
@@ -160,6 +164,20 @@ module.exports = {
       } catch (err) {
         throw new Error('게시판을 검색할 수 없습니다.')
       }
+    } else if (type == 'store') {
+      try {
+        let [result] = await pool.query('SELECT store_indexholder, store_name, store_type, store_master \
+        FROM store_information \
+        WHERE store_name LIKE ? OR store_type LIKE ? OR store_master ? group by store_id', [variable, variable, variable])
+        if (result.length == 0) {
+          return res.status(200).json({ 'result': '조건에 맞는 결과가 없습니다.' })
+        }
+        return res.status(200).json({ result: result })
+      } catch (err) {
+        throw new Error('스토어를 검색할 수 없습니다.')
+      }
+    } else {
+      return res.status(200).json({ 'result': '조건을 입력하지 않았습니다.' })
     }
   }
 }
