@@ -34,9 +34,10 @@ module.exports = {
     }
   },
   claimJWTAccessToken: async (payload) => {
+    // FIXME: CHANGE TOKEN EXPIRY IN PRODUCTION!!!!!!!
     let base_payload = {
       iss: 'team.Ojeongdong.Economics.Guardians',
-      exp: Math.floor(Date.now() / 1000) + 300,
+      exp: Math.floor(Date.now() / 1000) + 1296000,
       ...payload,
     }
 
@@ -75,6 +76,7 @@ module.exports = {
       let claimJWTToken = await pool.execute('insert into oauth_id (member_id, provider, oauth_version, refresh_token, expired_at) values (?,?,?,?,?)', [member_id, provider, oauth_version, refresh_token, expiry_date])
       return refresh_token
     } catch (err) {
+      console.log(err)
       throw new Error('최소 사용자의 JWT Refresh 토큰 생성 중 오류 발생.')
     }
   },
@@ -142,6 +144,30 @@ module.exports = {
     } catch (err) {
       console.log(err)
       return false
+    }
+  },
+  checkUserNickname: async (member_id) => {
+    try {
+      let [username] = await pool.query('select member_id, nickname from users where member_id = ?', [member_id])
+      if (username.length == 1) {
+        return username[0].nickname
+      } else {
+        return false
+      }
+    } catch (err) {
+      throw new Error('User Nickname 조회에 실패했습니다.')
+    }
+  },
+  getLatestUpdateReferenceId: async (member_id) => {
+    try {
+      let [ref_id] = await pool.query('select id from users where member_id = ? order by id desc limit 1', [member_id])
+      if (ref_id.length == 1) {
+        return ref_id[0].id
+      } else {
+        return false
+      }
+    } catch (err) {
+      throw new Error('Latest Ref ID 를 조회하지 못했습니다.')
     }
   }
 }

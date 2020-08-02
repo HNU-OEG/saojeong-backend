@@ -24,7 +24,8 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "rand-token": "^1.0.1"
+    "rand-token": "^1.0.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "axios": "^0.19.2",
