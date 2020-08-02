@@ -1,8 +1,5 @@
-const express = require('express')
-const router = express.Router()
 
 const BoardHelper = require('../../../Helper/BoardHelper')
-const faker = require('faker/locale/ko')
 const BoardHelper2 = require('../../../Helper/BoardHelper2')
 const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
