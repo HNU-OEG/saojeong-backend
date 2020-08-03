@@ -33,7 +33,24 @@ module.exports = {
       .catch(err => res.status(503).send(err))
   },
   RemoveBoardContent: async (req, res, next) => {
-
+    /**
+     * URI: [DELETE, /api/board/:category/content/:documentId]
+     */
+    let data = await BoardHelper.getRemoveBoardContentDto(req)
+    let removeBoardContent = BoardHelper.removeBoardContent(data)
+    removeBoardContent.then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  VoteBoardContent: async (req, res, next) => {
+    /**
+     * URI: [PATCH, /api/board/:category/content/:documentId?type=[vote,blame]&task=[up,down]]
+     * Query String: ...?type=[vote,blame]&task=[up,down]
+     */
+    let data = await BoardHelper.getVoteBoardContentDto(req)
+    console.log(data)
+    let voteBoardContent = BoardHelper.voteBoardContent(data)
+    voteBoardContent.then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
   },
   PostNewComment: async (req, res, next) => {
     let document_id = req.params.documentId

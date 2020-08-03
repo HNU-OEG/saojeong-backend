@@ -141,13 +141,13 @@ module.exports = {
     try {
       let writePost = await pool.execute(
         'INSERT INTO `board_contents` \
-                (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
-                VALUES (?, ?, ?, ?, ?) ', [data.board_category, data.member_id, data.title, data.content, data.member_ip]
+        (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
+        VALUES (?, ?, ?, ?, ?) ', [data.board_category, data.member_id, data.title, data.content, data.member_ip]
       )
 
       let [checkWritingPost] = await pool.query(
         'SELECT * FROM `board_contents` \
-                WHERE `document_id`= last_insert_id()'
+        WHERE `document_id`= last_insert_id()'
       )
 
       console.log('게시글 생성 완료\n', checkWritingPost[0])
@@ -170,9 +170,10 @@ module.exports = {
     try {
       let edit = pool.execute(
         'UPDATE `board_contents` \
-        SET `title` = ?, `content` = ?, `last_updated_ip` = ?, `last_updated_id` = ? \
+        SET `title` = ?, `content` = ?, `last_updated_ip` = ?, `last_updated_id` = ?, \
         `last_updated_date` = CURRENT_TIMESTAMP(), `version` = `version` + 1 \
-        WHERE `document_id` = ?', [data.title, data.user_ip, data.member_id, data.document_id])
+        WHERE `document_id` = ?',
+        [data.title, data.content, data.user_ip, data.member_id, data.document_id])
 
       let [checkEdited] = await pool.query(
         'SELECT * FROM `board_contents` \
@@ -188,7 +189,7 @@ module.exports = {
     return {
       'member_id': req.user.member_id,
       'user_ip': faker.internet.ip(),
-      'document_id': req.params.document_id,
+      'document_id': req.params.documentId,
       // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
       'title': req.body.title,
       'content': req.body.content,
@@ -198,7 +199,7 @@ module.exports = {
     try {
       let remove = pool.execute(
         'UPDATE `board_contents` \
-        SET `last_updated_ip` = ?, `last_updated_id` = ? \
+        SET `last_updated_ip` = ?, `last_updated_id` = ?, \
         `is_visible` = 0, `last_updated_date` = CURRENT_TIMESTAMP(), `version` = `version` + 1 \
         WHERE `document_id` = ?', [data.user_ip, data.member_id, data.document_id])
 
@@ -217,68 +218,36 @@ module.exports = {
       'member_id': req.user.member_id,
       'user_ip': faker.internet.ip(),
       // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      'document_id': req.params.document_id,
+      'document_id': req.params.documentId,
     }
   },
-  DeleteBoardContent: async (req, res, next) => {
-    /**
-     * URI: [DELETE, /api/board/:category/content/:documentId]
-      */
-    let documentId = req.params.documentId
-    let isVisible = 0
-    // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    let ip = faker.internet.ip()
-
+  voteBoardContent: async (data) => {
     try {
-      let query = await pool.execute(
+      let vote = await pool.execute(
         'UPDATE `board_contents` \
-                SET `is_visible` = ?, `last_updated_ip` = ?, `last_updated_date` = CURRENT_TIMESTAMP() \
-                WHERE `document_id` = ?', [isVisible, ip, documentId]
-      )
-
-      let [response] = await pool.query(
-        'SELECT * FROM `board_contents` \
-                WHERE `document_id` = ?', [documentId]
-      )
-
-      console.log('게시글 삭제 완료: ', response[0])
-      res.status(201).json(response[0])
-    } catch (e) {
-      res.send(503, e)
-      throw new Error('게시글 삭제 중 오류 발생: ', e)
-    }
-  },
-
-  PatchBoardContentVoteOrBlame: async (req, res, next) => {
-    /**
-                           * URI: [PATCH, /api/board/:category/content/:documentId]
-                           * Query String: ...?type=[vote,blame]&task=[up,down]
-                           */
-    let documentId = req.params.documentId
-    let columnName = req.query.type === 'vote' ? 'voted_count' : 'blamed_count'
-    let task = req.query.task === 'up' ? '+ 1' : '- 1'
-
-    try {
-      let query = await pool.execute(
-        'UPDATE `board_contents` \
-                SET `'+ columnName + '` = `' + columnName + '` ' + task + ' \
-                WHERE `document_id` = ?', [documentId]
+        SET `'+ data.column_name + '` = `' + data.column_name + '` ' + data.task + ' \
+        WHERE `document_id` = ?', [data.document_id]
       )
 
       // TODO: 좋아요 표시한 게시물 USER TABLE에 기록해야함
 
-      let [response] = await pool.query(
+      let [checkVoted] = await pool.query(
         'SELECT * FROM `board_contents` \
-                WHERE `document_id` = ?', [documentId]
+        WHERE `document_id` = ?', [data.document_id]
       )
 
-      console.log('추천/비추천 업데이트 완료: ', response[0])
-      res.status(201).json(response[0])
+      console.log('게시글 추천/비추천 완료\n', checkVoted[0])
+      return checkVoted[0]
     } catch (e) {
-      res.status(503).send(e)
-      throw new Error('추천/비추천 업데이트 중 오류 발생: ', e)
+      throw new Error('게시글 추천/비추천 중 오류 발생\n', e)
     }
-
-  }
-
+  },
+  getVoteBoardContentDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'document_id': req.params.documentId,
+      'column_name': req.query.type === 'vote' ? 'voted_count' : 'blamed_count',
+      'task': req.query.task === 'up' ? '+ 1' : '- 1',
+    }
+  },
 }
