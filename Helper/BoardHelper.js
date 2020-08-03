@@ -1,17 +1,18 @@
 const faker = require('faker/locale/ko')
 const pool = require('../config/db')
 const BoardHelper2 = require('./BoardHelper2')
+const { title } = require('faker/lib/locales/ko')
 
 
 module.exports = {
   // CheckUsername:
   CreateBoard: async (req, res, next) => {
     /**
-     *  URI: [POST, /api/board]
-     *  Request Body: {
-     *    "name": "OO게시판"
-     *  }
-     */
+         *  URI: [POST, /api/board]
+         *  Request Body: {
+         *    "name": "OO게시판"
+         *  }
+         */
 
     let name = req.body.name
     let ip = faker.internet.ip()
@@ -38,16 +39,16 @@ module.exports = {
 
   GetBoardContent: async (req, res, next) => {
     /**
-     * URI: [GET, /api/board/:category/content/:documentId]
-     * Response Body: {
-     *   "document_id": :documentId,
-     *   "title": "TEST01",
-     *   "content": "TEST0001",
-     *   "created_at": "07.26 09:25",
-     *   "category": "공지사항"
-     *   "author": "Intelligent Metal Sausages"
-     * }
-     */
+         * URI: [GET, /api/board/:category/content/:documentId]
+         * Response Body: {
+         *   "document_id": :documentId,
+         *   "title": "TEST01",
+         *   "content": "TEST0001",
+         *   "created_at": "07.26 09:25",
+         *   "category": "공지사항"
+         *   "author": "Intelligent Metal Sausages"
+         * }
+         */
 
     let memberId = 18
     // let memberId = req.passport.user;
@@ -106,12 +107,12 @@ module.exports = {
 
   GetAllBoardContentOrderByMethod: async (req, res, next) => {
     /**
-     * URI: [GET, /api/board/:category/content/]
-     * Query String: ...?method=vote
-     * method={method}를 기준으로 DESC 정렬 리스트 리턴
-     * method가 없을 시 document_id를 기준으로 DESC 정렬 리턴
-     * Zeplin: 커뮤니티
-     */
+         * URI: [GET, /api/board/:category/content/]
+         * Query String: ...?method=vote
+         * method={method}를 기준으로 DESC 정렬 리스트 리턴
+         * method가 없을 시 document_id를 기준으로 DESC 정렬 리턴
+         * Zeplin: 커뮤니티
+         */
 
 
     let orderBy = { undefined: 'document_id', 'vote': 'voted_count' }
@@ -136,17 +137,17 @@ module.exports = {
 
   },
 
-  createBoardContent: async (data) => {
+  postNewBoardContent: async (data) => {
     try {
       let writePost = await pool.execute(
         'INSERT INTO `board_contents` \
-        (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
-        VALUES (?, ?, ?, ?, ?) ', [data.board_category, data.member_id, data.title, data.content, data.ip]
+                (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
+                VALUES (?, ?, ?, ?, ?) ', [data.board_category, data.member_id, data.title, data.content, data.member_ip]
       )
 
       let [checkWritingPost] = await pool.query(
         'SELECT * FROM `board_contents` \
-        WHERE `document_id`= last_insert_id()'
+                WHERE `document_id`= last_insert_id()'
       )
 
       console.log('게시글 생성 완료\n', checkWritingPost[0])
@@ -155,61 +156,50 @@ module.exports = {
       throw new Error('게시글 생성 중 오류 발생\n', e)
     }
   },
-  getWritePostDto: async (req) => {
+  getPostNewBoardContentDto: async (req) => {
     return {
       'member_id': req.user.member_id,
+      'user_ip': faker.internet.ip(),
+      // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
       'board_category': req.params.category,
       'title': req.body.title,
-      'content': req.body.article,
-      // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      'ip': faker.internet.ip(),
+      'content': req.body.content,
     }
   },
-
-  UpdateBoardContent: async (req, res, next) => {
-    /**
-               * URI: [PUT, /api/board/:category/content/:documentId]
-               * Request Body: {
-               *   "member_id": 1,
-               *   "content": {
-               *     "title": "title",
-               *     "content": "content"
-               *   }
-               * }
-               */
-
-    let memberId = req.body.member_id
-    let boardCategory = req.params.category
-    let documentId = req.params.documentId
-    let title = req.body.content.title
-    let content = req.body.content.content
-    // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    let ip = faker.internet.ip()
+  editBoardContent: async (data) => {
 
     try {
-      let query = await pool.execute(
-        'INSERT INTO `board_contents` \
-                (`board_category`, `member_id`, `title`, `content`, `last_updated_ip`, `last_updated_id` ) \
-                VALUES (?, ?, ?, ?, ?, ?) ', [boardCategory, memberId, title, content, ip, documentId]
-      )
+      let edit = pool.execute(
+        'UPDATE `board_contents` \
+        SET `title` = ?, `content` = ?, `last_updated_ip` = ?, `last_updated_id` = ? \
+        `last_updated_date` = CURRENT_TIMESTAMP(), `version` = `version` + 1 \
+        WHERE `document_id` = ?', [data.title, data.user_ip, data.member_id, data.document_id])
 
-      let [response] = await pool.query(
+      let [checkEdited] = await pool.query(
         'SELECT * FROM `board_contents` \
-                WHERE `document_id`= last_insert_id()'
-      )
+        WHERE `document_id`= ?', [data.document_id])
 
-      console.log('게시글 수정 완료: ', response[0])
-      res.status(201).json(response[0])
+      console.log('게시글 수정 완료\n', checkEdited[0])
+      return checkEdited[0]
     } catch (e) {
-      res.send(503, e)
-      throw new Error('게시글 수정 중 오류 발생: ', e)
+      throw new Error('게시글 수정 중 오류 발생\n', e)
+    }
+  },
+  getEditBoardContentDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'user_ip': faker.internet.ip(),
+      'document_id': req.body.document_id,
+      // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      'title': req.body.title,
+      'content': req.body.content,
     }
   },
 
   DeleteBoardContent: async (req, res, next) => {
     /**
-                   * URI: [DELETE, /api/board/:category/content/:documentId]
-                   */
+                       * URI: [DELETE, /api/board/:category/content/:documentId]
+                       */
     let documentId = req.params.documentId
     let isVisible = 0
     // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -237,9 +227,9 @@ module.exports = {
 
   PatchBoardContentVoteOrBlame: async (req, res, next) => {
     /**
-                       * URI: [PATCH, /api/board/:category/content/:documentId]
-                       * Query String: ...?type=[vote,blame]&task=[up,down]
-                       */
+                           * URI: [PATCH, /api/board/:category/content/:documentId]
+                           * Query String: ...?type=[vote,blame]&task=[up,down]
+                           */
     let documentId = req.params.documentId
     let columnName = req.query.type === 'vote' ? 'voted_count' : 'blamed_count'
     let task = req.query.task === 'up' ? '+ 1' : '- 1'

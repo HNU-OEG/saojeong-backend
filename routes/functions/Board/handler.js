@@ -5,17 +5,32 @@ const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
 
 module.exports = {
-  WritePost: async (req, res, next) => {
+  PostNewBoardContent: async (req, res, next) => {
     /**
      * URI: [POST, /api/board/:category/content]
      * Request Body: {
+     *  "document_id": "...",
      *  "title": "...",
-     *  "article": "..."
+     *  "content": "..."
      * }
      */
-    let data = await BoardHelper.getWritePostDto(req)
-    let insertPost = BoardHelper.createBoardContent(data)
-    insertPost.then(result => res.status(201).json(result))
+    let data = await BoardHelper.getPostNewBoardContentDto(req)
+    let postBoardContent = BoardHelper.postNewBoardContent(data)
+    postBoardContent.then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  EditBoardContent: async (req, res, next) => {
+    /**
+     * URI: [PUT, /api/board/:category/content/:document_id]
+     * Request Body: {
+     *  "document_id": ...,
+     *  "title": "...",
+     *  "content": "..." 
+     * }
+     */
+    let data = await BoardHelper.getEditBoardContentDto(req)
+    let editBoardContent = BoardHelper.editBoardContent(data)
+    editBoardContent.then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   PostNewComment: async (req, res, next) => {

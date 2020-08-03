@@ -9,8 +9,10 @@ router.post('/', BoardHelper.CreateBoard)
 // 게시글 관련
 router.get('/:category/content', BoardHelper.GetAllBoardContentOrderByMethod)
 router.get('/:category/content/:documentId', BoardHelper.GetBoardContent)
-router.post('/:category/content', BoardHandler.WritePost)
-router.put('/:category/content/:documentId', BoardHelper.UpdateBoardContent)
+
+router.post('/:category/content', BoardHandler.PostNewBoardContent)
+router.put('/:category/content/:documentId', BoardHandler.EditBoardContent)
+
 router.delete('/:category/content/:documentId', BoardHelper.DeleteBoardContent)
 router.patch('/:category/content/:documentId', BoardHelper.PatchBoardContentVoteOrBlame)
 
