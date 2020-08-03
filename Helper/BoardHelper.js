@@ -39,16 +39,16 @@ module.exports = {
 
   GetBoardContent: async (req, res, next) => {
     /**
-         * URI: [GET, /api/board/:category/content/:documentId]
-         * Response Body: {
-         *   "document_id": :documentId,
-         *   "title": "TEST01",
-         *   "content": "TEST0001",
-         *   "created_at": "07.26 09:25",
-         *   "category": "공지사항"
-         *   "author": "Intelligent Metal Sausages"
-         * }
-         */
+     * URI: [GET, /api/board/:category/content/:documentId]
+     * Response Body: {
+     *   "document_id": :documentId,
+     *   "title": "TEST01",
+     *   "content": "TEST0001",
+     *   "created_at": "07.26 09:25",
+     *   "category": "공지사항"
+     *   "author": "Intelligent Metal Sausages"
+     * }
+     */
 
     let memberId = 18
     // let memberId = req.passport.user;
@@ -167,7 +167,6 @@ module.exports = {
     }
   },
   editBoardContent: async (data) => {
-
     try {
       let edit = pool.execute(
         'UPDATE `board_contents` \
@@ -189,17 +188,42 @@ module.exports = {
     return {
       'member_id': req.user.member_id,
       'user_ip': faker.internet.ip(),
-      'document_id': req.body.document_id,
-      // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      'document_id': req.params.document_id,
+      // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
       'title': req.body.title,
       'content': req.body.content,
     }
   },
+  removeBoardContent: async (data) => {
+    try {
+      let remove = pool.execute(
+        'UPDATE `board_contents` \
+        SET `last_updated_ip` = ?, `last_updated_id` = ? \
+        `is_visible` = 0, `last_updated_date` = CURRENT_TIMESTAMP(), `version` = `version` + 1 \
+        WHERE `document_id` = ?', [data.user_ip, data.member_id, data.document_id])
 
+      let [checkRemoved] = await pool.query(
+        'SELECT * FROM `board_contents` \
+        WHERE `document_id`= ?', [data.document_id])
+
+      console.log('게시글 삭제 완료\n', checkRemoved[0])
+      return checkRemoved[0]
+    } catch (e) {
+      throw new Error('게시글 삭제 중 오류 발생\n', e)
+    }
+  },
+  getRemoveBoardContentDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'user_ip': faker.internet.ip(),
+      // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      'document_id': req.params.document_id,
+    }
+  },
   DeleteBoardContent: async (req, res, next) => {
     /**
-                       * URI: [DELETE, /api/board/:category/content/:documentId]
-                       */
+     * URI: [DELETE, /api/board/:category/content/:documentId]
+      */
     let documentId = req.params.documentId
     let isVisible = 0
     // let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

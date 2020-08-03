@@ -23,7 +23,6 @@ module.exports = {
     /**
      * URI: [PUT, /api/board/:category/content/:document_id]
      * Request Body: {
-     *  "document_id": ...,
      *  "title": "...",
      *  "content": "..." 
      * }
@@ -32,6 +31,9 @@ module.exports = {
     let editBoardContent = BoardHelper.editBoardContent(data)
     editBoardContent.then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
+  },
+  RemoveBoardContent: async (req, res, next) => {
+
   },
   PostNewComment: async (req, res, next) => {
     let document_id = req.params.documentId
