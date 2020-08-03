@@ -5,6 +5,15 @@ const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
 
 module.exports = {
+  ReadBoardContent: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/board/:category/content/:documentId]
+     */
+    let data = await BoardHelper.getReadBoardContentDto(req)
+    let readBoardContent = BoardHelper.readBoardContent(data)
+    readBoardContent.then(result => res.status(201).json(result))
+      .cathc(err => res.status(503).send(err))
+  },
   PostNewBoardContent: async (req, res, next) => {
     /**
      * URI: [POST, /api/board/:category/content]

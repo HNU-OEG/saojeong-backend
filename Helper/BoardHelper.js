@@ -36,34 +36,27 @@ module.exports = {
       throw new Error('게시판 생성 중 오류 발생')
     }
   },
-
-  GetBoardContent: async (req, res, next) => {
-    /**
-     * URI: [GET, /api/board/:category/content/:documentId]
-     * Response Body: {
-     *   "document_id": :documentId,
-     *   "title": "TEST01",
-     *   "content": "TEST0001",
-     *   "created_at": "07.26 09:25",
-     *   "category": "공지사항"
-     *   "author": "Intelligent Metal Sausages"
-     * }
-     */
-
-    let memberId = 18
-    // let memberId = req.passport.user;
-    let documentId = req.params.documentId
-
+  getReadBoardContentDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'document_id': req.params.documentId,
+    }
+  },
+  readBoardContent: async (data) => {
     try {
       let [content] = await pool.query(
         'SELECT c.document_id, c.title, c.content, DATE_FORMAT(c.created_at, \'%m.%d %H:%i\') AS created_at, b.name AS category, u.nickname AS author \
-                FROM `board_contents` AS `c` \
-                INNER JOIN `boards` AS `b` ON c.board_category = b.board_id \
-                INNER JOIN `users` AS `u` ON c.member_id = u.member_id \
-                WHERE c.document_id = ?', [documentId]
+        FROM `board_contents` AS `c` \
+        INNER JOIN `boards` AS `b` ON c.board_category = b.board_id \
+        INNER JOIN `users` AS `u` ON c.member_id = u.member_id \
+        WHERE c.document_id = ?', [data.document_id]
       )
 
-      let [replies] = await pool.query('SELECT comm.comment_id, comm.member_id, comm.comment_author, comm.comment_created_at, comm.comment_content, comm.comment_parent FROM board_contents cont, board_comments comm WHERE cont.document_id = comm.document_id AND comm.is_visible = 1 ORDER BY comm.comment_created_at asc')
+      let [replies] = await pool.query(
+        'SELECT comm.comment_id, comm.member_id, comm.comment_author, comm.comment_created_at, comm.comment_content, comm.comment_parent \
+        FROM board_contents cont, board_comments comm \
+        WHERE cont.document_id = ? AND cont.document_id = comm.document_id AND comm.is_visible = 1 \
+        ORDER BY comm.comment_created_at ASC', [data.document_id])
 
       var comments = []
       let comment = replies.map(reply => {
@@ -90,17 +83,13 @@ module.exports = {
         return el != null
       })
 
-      console.log(comments)
+      let readCountQuery = await BoardHelper2.incrementBoardCount(data.document_id)
+      let logging_read = await BoardHelper2.loggingReadLog(data.member_id, data.document_id)
 
-
-      let readCountQuery = await BoardHelper2.incrementBoardCount(documentId)
-      let logging_read = await BoardHelper2.loggingReadLog(memberId, documentId)
-
-      console.log('게시글 조회 완료: ', content[0])
-      res.status(201).json({ content: content[0], comments: comments })
+      let response = { content: content[0], comments: comments }
+      console.log('게시글 조회 완료: ', response)
+      return response
     } catch (e) {
-      console.log(e)
-      res.status(503).send(e)
       throw new Error('게시글 조회 중 오류 발생: ', e)
     }
   },
