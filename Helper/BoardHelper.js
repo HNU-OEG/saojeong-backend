@@ -36,16 +36,10 @@ module.exports = {
       throw new Error('게시판 생성 중 오류 발생')
     }
   },
-  getReadBoardContentDto: async (req) => {
-    return {
-      'member_id': req.user.member_id,
-      'document_id': req.params.documentId,
-    }
-  },
   readBoardContent: async (data) => {
     try {
       let [content] = await pool.query(
-        'SELECT c.document_id, c.title, c.content, DATE_FORMAT(c.created_at, \'%m.%d %H:%i\') AS created_at, b.name AS category, u.nickname AS author \
+        'SELECT c.document_id, c.title, c.content, DATE_FORMAT(c.created_at, \'%m.%d %H:%i\') AS created_at, c.voted_count, c.blamed_count, b.name AS category, u.nickname AS author \
         FROM `board_contents` AS `c` \
         INNER JOIN `boards` AS `b` ON c.board_category = b.board_id \
         INNER JOIN `users` AS `u` ON c.member_id = u.member_id \
@@ -93,45 +87,62 @@ module.exports = {
       throw new Error('게시글 조회 중 오류 발생: ', e)
     }
   },
-
-  GetAllBoardContentOrderByMethod: async (req, res, next) => {
-    /**
-         * URI: [GET, /api/board/:category/content/]
-         * Query String: ...?method=vote
-         * method={method}를 기준으로 DESC 정렬 리스트 리턴
-         * method가 없을 시 document_id를 기준으로 DESC 정렬 리턴
-         * Zeplin: 커뮤니티
-         */
-
-
-    let orderBy = { undefined: 'document_id', 'vote': 'voted_count' }
-    let category = req.params.category
-    let method = orderBy[req.query.method]
-
+  getReadBoardContentDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'document_id': req.params.documentId,
+    }
+  },
+  readAllFreeBoardContents: async (data) => {
     try {
-      let [response] = await pool.query(
-        'SELECT `title`, `title` AS `author`, DATE_FORMAT(created_at, \'%m.%d %H:%i\') AS `created_at`, `comment_count` \
-                FROM `board_contents` \
-                WHERE `board_category` = ? AND `is_visible` = 1 \
-                ORDER BY ? DESC', [category, method]
+      let [contentOrderByCreated] = await pool.query(
+        'SELECT b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
+        FROM board_contents AS b, users AS u \
+        WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 \
+        ORDER BY b.created_at DESC', [data.category]
       )
 
+      let [contentOrderByVoted] = await pool.query(
+        'SELECT b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
+        FROM board_contents AS b, users AS u \
+        WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 AND b.voted_count > 0 \
+        ORDER BY b.voted_count DESC LIMIT 2', [data.category]
+      )
 
-      console.log('게시글 전체 조회 완료: ', response)
-      res.status(201).json(response[0])
+      let response = { normal: contentOrderByCreated, hot: contentOrderByVoted, }
+      console.log('자유게시판 조회 완료: ', response)
+      return response
     } catch (e) {
-      res.status(503).send(e)
-      throw new Error('게시글 전체 조회 중 오류 발생: ', e)
+      throw new Error('자유게시판 조회 중 오류 발생: ', e)
     }
-
   },
+  readAllNoticeBoardContents: async (data) => {
+    try {
+      let [response] = await pool.query(
+        'SELECT b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
+        FROM board_contents AS b, users AS u \
+        WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 \
+        ORDER BY b.created_at DESC', [data.category]
+      )
 
+      console.log('공지사항 전체 조회 완료: ', response)
+      return response
+    } catch (e) {
+      throw new Error('공지사항 전체 조회 중 오류 발생: ', e)
+    }
+  },
+  getReadAllBoardContentsDto: async (req) => {
+    return {
+      'category': req.params.category,
+    }
+  },
   postNewBoardContent: async (data) => {
     try {
       let writePost = await pool.execute(
         'INSERT INTO `board_contents` \
-        (`board_category`, `member_id`, `title`, `content`, `last_updated_ip` ) \
-        VALUES (?, ?, ?, ?, ?) ', [data.board_category, data.member_id, data.title, data.content, data.member_ip]
+        (`board_category`, `member_id`, `title`, `content`, `last_updated_ip`) \
+        VALUES (?, ?, ?, ?, ?)',
+        [data.category, data.member_id, data.title, data.content, data.user_ip]
       )
 
       let [checkWritingPost] = await pool.query(
@@ -150,7 +161,7 @@ module.exports = {
       'member_id': req.user.member_id,
       'user_ip': faker.internet.ip(),
       // "ip": req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      'board_category': req.params.category,
+      'category': req.params.category,
       'title': req.body.title,
       'content': req.body.content,
     }

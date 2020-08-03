@@ -7,7 +7,7 @@ const BoardHandler = require('./functions/Board/handler')
 router.post('/', BoardHelper.CreateBoard)
 
 // 게시글 관련
-router.get('/:category/content', BoardHelper.GetAllBoardContentOrderByMethod)
+router.get('/:category/content', BoardHandler.ReadAllBoardContents)
 router.get('/:category/content/:documentId', BoardHandler.ReadBoardContent)
 router.post('/:category/content', BoardHandler.PostNewBoardContent)
 router.put('/:category/content/:documentId', BoardHandler.EditBoardContent)

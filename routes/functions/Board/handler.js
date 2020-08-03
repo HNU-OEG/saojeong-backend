@@ -12,7 +12,22 @@ module.exports = {
     let data = await BoardHelper.getReadBoardContentDto(req)
     let readBoardContent = BoardHelper.readBoardContent(data)
     readBoardContent.then(result => res.status(201).json(result))
-      .cathc(err => res.status(503).send(err))
+      .cath(err => res.status(503).send(err))
+  },
+  ReadAllBoardContents: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/board/:category/content]
+     */
+    let data = await BoardHelper.getReadAllBoardContentsDto(req)
+    if (data.category === '10000') { // 자유게시판
+      let freeBoardContents = BoardHelper.readAllFreeBoardContents(data)
+      freeBoardContents.then(result => res.status(201).json(result))
+        .catch(err => res.status(503).send(err))
+    } else if (data.category === '10001') { // 공지사항
+      let noticeBoardContents = BoardHelper.readAllNoticeBoardContents(data)
+      noticeBoardContents.then(result => res.status(201).json(result))
+        .catch(err => res.status(503).send(err))
+    }
   },
   PostNewBoardContent: async (req, res, next) => {
     /**
@@ -24,6 +39,7 @@ module.exports = {
      * }
      */
     let data = await BoardHelper.getPostNewBoardContentDto(req)
+    console.log(data)
     let postBoardContent = BoardHelper.postNewBoardContent(data)
     postBoardContent.then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
