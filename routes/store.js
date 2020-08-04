@@ -3,6 +3,7 @@ var router = express.Router()
 const StoreHelper = require('../Helper/StoreHelper')
 const StoreHandler = require('./functions/Store/handler.js')
 
+router.get('/', StoreHandler.ReadAllStoreOrderByStar)
 router.post('/', StoreHandler.CreateStoreInformation)
 router.post('/:storeId/star', StoreHandler.RegisterStarredStore)
 router.delete('/:storeId/star', StoreHandler.UnRegisterStarredStore)

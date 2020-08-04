@@ -16,8 +16,15 @@ module.exports = {
       .then(result => res.status(201).send(result))
       .catch(err => res.status(503).send(err))
   },
-  ReadAllStore: async (req, res, next) => {
-
+  ReadAllStoreOrderByStar: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/store]
+     */
+    let data = await StoreHelper.getReadOrderByStarDto(req)
+    let readAllStore = StoreHelper.readOrderByStar(data)
+    readAllStore
+      .then(result => res.status(201).json(result[0]))
+      .catch(err => res.status(503).send(err))
   },
   RegisterStarredStore: async (req, res, next) => {
     /**

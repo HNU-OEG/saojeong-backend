@@ -2,30 +2,31 @@ const faker = require('faker/locale/ko')
 const pool = require('../config/db')
 
 module.exports = {
-  readAllStore: async (req, res, next) => {
-    // 평점평균
-    // 하트 눌렀는지
-    // 72번
-    // 상점이름
-    // 평가인원
-    // 사진
+  readOrderByStar: async (data) => {
     try {
-      // let query = await pool.query(
-      //   "SELECT s.store_indexholder AS store_number, s.store_name, s.store_image, s.vote_grade_average, s.vote_grade_count, s.store_id \
-      //   FROM store_information AS s, users AS u, starred_store AS ss \
-      //   WHERE s.is_visible = 1 AND u.enabled = 1, AND ss.is_isvisible = 1 \"
-      // )
-
-      let [response] = await pool.query(
-        'SELECT * FROM `boards` \
-                WHERE `board_id`= last_insert_id()'
-      )
-
-      console.log('점포 리스트 조회 완료: ', response[0])
-      res.status(201).json(response[0])
+      let storeList = pool.query(
+        'SELECT \
+          `store_indexholder` AS `store_number`, \
+          `store_name`, `vote_grade_average`, \
+          `vote_grade_count`, `store_id`, \
+          IF\
+          ((SELECT `created_at` FROM `starred_store` AS ss \
+          WHERE `member_id` = ? AND `ss`.`store_id` = `si`.`store_id` AND `is_visible` = 1 LIMIT 1) \
+          IS NOT NULL, TRUE, FALSE) AS `starred` \
+        FROM `store_information` AS `si` \
+        WHERE `is_visible` = 1 \
+        ORDER BY `vote_grade_average` DESC', [data.member_id])
+        
+      console.log('평점순 점포 리스트 조회 완료: ', storeList)
+      return storeList
     } catch (e) {
-      res.status(503).send(e)
-      throw new Error('점포 리스트 조회 중 오류 발생')
+      console.log('평점 순 점포 리스트 조회 중 오류 발생' , e)
+      throw new Error('평점 순 점포 리스트 조회 중 오류 발생')
+    }
+  },
+  getReadOrderByStarDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
     }
   },
   createStoreInformation: async (data) => {
