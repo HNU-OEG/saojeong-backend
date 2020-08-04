@@ -29,14 +29,6 @@ module.exports = {
     }
   },
   createStoreInformation: async (data) => {
-    /**
-      * URI: [POST, /api/store]
-      * Request Body: {
-      *   "store_name": "...",
-      *   "store_number": ...,
-      *   "store_type": [과일, 채소, 수산],
-      * }
-      */
     try {
       let create = await pool.execute(
         'INSERT INTO `store_information` \
@@ -52,6 +44,7 @@ module.exports = {
       console.log('상점 생성 완료: ', response[0])
       return response[0]
     } catch (e) {
+      console.log('상점 생성 중 오류 발생\n', e)
       throw new Error('상점 생성 중 오류 발생')
     }
   },
@@ -61,6 +54,61 @@ module.exports = {
       'store_type': req.body.store_type,
       'store_name': req.body.store_name,
       'store_number': req.body.store_number,
+    }
+  },
+  registerStarredStore: async (data) => {
+    try {
+      let register = await pool.execute(
+        'INSERT INTO `starred_store` (`member_id`, `store_id`) \
+        VALUES (?, ?)', [data.member_id, data.store_id]
+      )
+
+      let [response] = await pool.query(
+        'SELECT * FROM `starred_store` \
+        WHERE `member_id`= ? AND `store_id` = ? AND `is_visible` = 1',
+        [data.member_id, data.store_id]
+      )
+
+      console.log('점포 좋아요 완료: ', response[0])
+      return response[0]
+    } catch (e) {
+      console.log('점포 좋아요 중 오류 발생\n', e)
+      throw new Error('점포 좋아요 중 오류 발생', e)
+    }
+  },
+  getRegisterStarredStoreDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_id': req.params.storeId,
+    }
+  },
+  unRegisterStarredStore: async (data) => {
+    try {
+      let unRegister = await pool.execute(
+        'UPDATE `starred_store` \
+        SET `is_visible` = 0, `removed_at` = CURRENT_TIMESTAMP() \
+        WHERE `member_id` = ? AND `store_id` = ? AND `is_visible` = 1', 
+        [data.member_id, data.store_id]
+      )
+
+      let [response] = await pool.query(
+        'SELECT * FROM `starred_store` \
+        WHERE `member_id`= ? AND `store_id` = ? AND `is_visible` = 0 \
+        ORDER BY `removed_at` DESC LIMIT 1',
+        [data.member_id, data.store_id]
+      )
+
+      console.log('점포 좋아요 취소 완료: ', response[0])
+      return response[0]
+    } catch (e) {
+      console.log('점포 좋아요 취소 중 오류 발생\n', e)
+      throw new Error('점포 좋아요 취소 중 오류 발생', e)
+    }
+  },
+  getUnRegisterStarredStoreDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_id': req.params.storeId,
     }
   },
   CreateStoreOpeningTime: async (req, res, next) => {
@@ -265,7 +313,6 @@ module.exports = {
     }
 
   },
-
   MappingOrderTypeToStore: async (req, res, next) => {
     /**
                  * URI: [POST, /api/store/:storeId/ordertype]
@@ -297,68 +344,6 @@ module.exports = {
     } catch (e) {
       res.status(503).send(e)
       throw new Error('거래방식 매핑 중 오류 발생')
-    }
-  },
-
-  CreateStarredStore: async (req, res, next) => {
-    /**
-     * URI: [POST, /api/store/:storeId/star]
-     */
-
-    
-    let storeId = req.params.storeId
-    // let memberId = req.user.member_id
-    let memberId = 18
-
-    try {
-
-      let query = await pool.execute(
-        'INSERT INTO `starred_store` (`member_id`, `store_id`) \
-        VALUES (?, ?)', [memberId, storeId])
-
-      
-
-      let [response] = await pool.query(
-        'SELECT * FROM `starred_store` \
-        WHERE `member_id` = ? AND `store_id` = ? AND `is_visible` = 1', [memberId, storeId])
-
-      console.log('좋아요 생성 완료: ', response[0])
-      res.status(201).json(response[0])
-    } catch (e) {
-      res.status(503).send(e)
-      throw new Error('좋아요 생성 중 오류 발생: ', e)
-    }
-  },
-
-  DeleteStarredStore: async (req, res, next) => {
-    /**
-      * URI: [DELETE, /api/store/:storeId/star]
-      */
-
-    
-    let storeId = req.params.storeId
-    // let memberId = req.user.member_id
-    let memberId = 18
-
-    try {
-
-      let removeStar = await pool.execute(
-        'UPDATE `starred_store` \
-        SET `removed_at` = CURRENT_TIMESTAMP(), `is_visible` = 0 \
-        WHERE `member_id` = ? AND `store_id` = ? AND `is_visible` = 1',
-        [memberId, storeId])
-
-      let [response] = await pool.query(
-        'SELECT * FROM `starred_store` \
-        WHERE `member_id` = ? AND `store_id` = ? AND `is_visible` = 0 \
-        ORDER BY `removed_at` DESC LIMIT 1', [memberId, storeId]
-      )
-
-      console.log('좋아요 취소 완료: ', response[0])
-      res.status(201).json(response[0])
-    } catch (e) {
-      res.status(503).send(e)
-      throw new Error('좋아요 취소 중 오류 발생: ', e)
     }
   },
 }
