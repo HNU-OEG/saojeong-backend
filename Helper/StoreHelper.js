@@ -152,38 +152,36 @@ module.exports = {
       'store_id': req.params.storeId,
     }
   },
-  CreateStoreOpeningTime: async (req, res, next) => {
-    /**
-      * URI: [POST, /api/store/time]
-      */
-
-    // Opening Times
-    let storeId = 1
-    let weekday = { 'sun': 1, 'mon': 2, 'tue': 3, 'wed': 4, 'thu': 5, 'fri': 6, 'sat': 7 }
-    let start_hour = '9:00'
-    let end_hour = '20:00'
-
+  createOpeningTime: async (req, sql) => {
     try {
-
-      for (let i = 1; i <= 7; i++) {
-        let query = await pool.query(
-          'INSERT INTO `store_opening_hours` \
-                    (`store_id`, `weekday`, `start_hour`, `end_hour`) \
-                    VALUES (?, ?, TIME(?), TIME(?))', [storeId, i, start_hour, end_hour]
-        )
-      }
-
+      
+      let create = await pool.execute(sql)
+      
       let [response] = await pool.query(
-        'SELECT `weekday`, `start_hour`, `end_hour` FROM `store_opening_hours` \
-                WHERE `store_id`= ?', [storeId]
+        'SELECT `weekday`, TIME_FORMAT(`start_hour`, "%H:%i") AS `open`, TIME_FORMAT(`end_hour`, "%H:%i") AS `close` FROM `store_opening_hours` \
+        WHERE `store_id`= ? ORDER BY `weekday` ASC', 
+        [req.params.storeId]
       )
 
       console.log('상점 영업 시간 생성 완료: ', response)
-      res.status(201).json(response)
+      return response
     } catch (e) {
-      res.status(503).send(e)
-      throw new Error('상점 영업 시간 생성 중 오류 발생')
+      console.log('상점 영업 시간 생성 중 오류 발생', e)
+      throw new Error('상점 영업 시간 생성 중 오류 발생', e)
     }
+  },
+  getSqlForCreateOpeningTIme: async (req) => {
+    let weekday = { 'sun': 1, 'mon': 2, 'tue': 3, 'wed': 4, 'thu': 5, 'fri': 6, 'sat': 7 }
+    let sql = 'INSERT INTO `store_opening_hours` \
+              (`store_id`, `weekday`, `start_hour`, `end_hour`) VALUES '
+
+    let valueList = []
+    for (let row in req.body) {
+      let day = req.body[row]
+      valueList.push('(' + req.params.storeId + ', ' + weekday[row] + ', TIME("' + day.open + '"), TIME("' + day.close + '"))')
+    }
+    sql += valueList.join(', ')
+    return sql
   },
 
   CreateStoreMerchandise: async (req, res, next) => {

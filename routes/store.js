@@ -8,8 +8,9 @@ router.get('/type/:type/orderby/:orderby', StoreHandler.ReadStoresOrderByType)
 router.post('/', StoreHandler.CreateStoreInformation)
 router.post('/:storeId/star', StoreHandler.RegisterStarredStore)
 router.delete('/:storeId/star', StoreHandler.UnRegisterStarredStore)
+router.post('/:storeId/time', StoreHandler.CreateOpeningTime)
 
-router.post('/time', StoreHelper.CreateStoreOpeningTime)
+
 router.post('/merchandise', StoreHelper.CreateStoreMerchandise)
 router.post('/telephone', StoreHelper.CreateStoreTelePhone)
 router.post('/:storeId/votegrade', StoreHelper.CreateVoteGrade)

@@ -63,4 +63,45 @@ module.exports = {
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
+  CreateOpeningTime: async (req, res, next) => {
+    /**
+      * URI: [POST, /api/store/:storeId/time]
+      * Request Body: {
+      *   "sun": {
+      *     "open": "09:00",
+      *     "close": "20:00"
+      *   },
+      *   "mon": {
+      *     "open": "09:00",
+      *     "close": "20:00"
+      *   },
+      *   "tue": {
+      *     "open": "09:00",
+      *     "close": "20:00"
+      *   },
+      *   "wed": {
+      *     "open": "09:00",
+      *     "close": "20:00"
+      *   },
+      *   "thu": {
+      *     "open": "09:00",
+      *     "close": "20:00"
+      *   },
+      *   "fri": {
+      *     "open": "09:00",
+      *     "close": "20:00"
+      *   },
+      *   "sat": {
+      *     "open": "09:00",
+      *     "close": "20:00"
+      *   },
+      * }
+      */
+
+    let sql = await StoreHelper.getSqlForCreateOpeningTIme(req)
+    let createOpeningTime = StoreHelper.createOpeningTime(req, sql)
+    createOpeningTime
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
 }
