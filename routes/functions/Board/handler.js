@@ -1,24 +1,80 @@
-const express = require('express')
-const router = express.Router()
 
 const BoardHelper = require('../../../Helper/BoardHelper')
-const faker = require('faker/locale/ko')
 const BoardHelper2 = require('../../../Helper/BoardHelper2')
 const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
 
 module.exports = {
-  WritePost: async (req, res, next) => {
+  ReadBoardContent: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/board/:category/content/:documentId]
+     */
+    let data = await BoardHelper.getReadBoardContentDto(req)
+    let readBoardContent = BoardHelper.readBoardContent(data)
+    readBoardContent.then(result => res.status(201).json(result))
+      .cath(err => res.status(503).send(err))
+  },
+  ReadAllBoardContents: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/board/:category/content]
+     */
+    let data = await BoardHelper.getReadAllBoardContentsDto(req)
+    if (data.category === '10000') { // 자유게시판
+      let freeBoardContents = BoardHelper.readAllFreeBoardContents(data)
+      freeBoardContents.then(result => res.status(201).json(result))
+        .catch(err => res.status(503).send(err))
+    } else if (data.category === '10001') { // 공지사항
+      let noticeBoardContents = BoardHelper.readAllNoticeBoardContents(data)
+      noticeBoardContents.then(result => res.status(201).json(result))
+        .catch(err => res.status(503).send(err))
+    }
+  },
+  PostNewBoardContent: async (req, res, next) => {
     /**
      * URI: [POST, /api/board/:category/content]
      * Request Body: {
+     *  "document_id": "...",
      *  "title": "...",
-     *  "article": "..."
+     *  "content": "..."
      * }
      */
-    let data = await BoardHelper.getWritePostDto(req)
-    let insertPost = BoardHelper.createBoardContent(data)
-    insertPost.then(result => res.status(201).json(result))
+    let data = await BoardHelper.getPostNewBoardContentDto(req)
+    console.log(data)
+    let postBoardContent = BoardHelper.postNewBoardContent(data)
+    postBoardContent.then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  EditBoardContent: async (req, res, next) => {
+    /**
+     * URI: [PUT, /api/board/:category/content/:document_id]
+     * Request Body: {
+     *  "title": "...",
+     *  "content": "..." 
+     * }
+     */
+    let data = await BoardHelper.getEditBoardContentDto(req)
+    let editBoardContent = BoardHelper.editBoardContent(data)
+    editBoardContent.then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  RemoveBoardContent: async (req, res, next) => {
+    /**
+     * URI: [DELETE, /api/board/:category/content/:documentId]
+     */
+    let data = await BoardHelper.getRemoveBoardContentDto(req)
+    let removeBoardContent = BoardHelper.removeBoardContent(data)
+    removeBoardContent.then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  VoteBoardContent: async (req, res, next) => {
+    /**
+     * URI: [PATCH, /api/board/:category/content/:documentId?type=[vote,blame]&task=[up,down]]
+     * Query String: ...?type=[vote,blame]&task=[up,down]
+     */
+    let data = await BoardHelper.getVoteBoardContentDto(req)
+    console.log(data)
+    let voteBoardContent = BoardHelper.voteBoardContent(data)
+    voteBoardContent.then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   PostNewComment: async (req, res, next) => {
@@ -148,6 +204,10 @@ module.exports = {
     let type = req.query.type
     let query = req.query.value
 
+    if (query.length <= 2) {
+      return res.status(200).json({ 'result': '검색어는 최소 3자리부터 입력해야 합니다.' })
+    }
+
     let variable = '%${query}%'
 
     if (type == 'board') {
@@ -160,6 +220,20 @@ module.exports = {
       } catch (err) {
         throw new Error('게시판을 검색할 수 없습니다.')
       }
+    } else if (type == 'store') {
+      try {
+        let [result] = await pool.query('SELECT store_indexholder, store_name, store_type, store_master \
+        FROM store_information \
+        WHERE store_name LIKE ? OR store_type LIKE ? OR store_master ? group by store_id', [variable, variable, variable])
+        if (result.length == 0) {
+          return res.status(200).json({ 'result': '조건에 맞는 결과가 없습니다.' })
+        }
+        return res.status(200).json({ result: result })
+      } catch (err) {
+        throw new Error('스토어를 검색할 수 없습니다.')
+      }
+    } else {
+      return res.status(200).json({ 'result': '조건을 입력하지 않았습니다.' })
     }
   }
 }

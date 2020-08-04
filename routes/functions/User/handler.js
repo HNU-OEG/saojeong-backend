@@ -1,10 +1,7 @@
-const express = require('express')
-const router = express.Router()
 const faker = require('faker')
 const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
 const jwt = require('jsonwebtoken')
-const passport = require('../../../config/passport')
 const randToken = require('rand-token')
 
 module.exports = {

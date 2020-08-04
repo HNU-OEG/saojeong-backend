@@ -1,6 +1,4 @@
 const pool = require('../config/db')
-const axios = require('axios')
-const cheerio = require('cheerio')
 const fs = require('fs').promises
 const path = require('path')
 const jwt = require('jsonwebtoken')
