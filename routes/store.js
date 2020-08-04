@@ -1,8 +1,10 @@
 var express = require('express')
 var router = express.Router()
 const StoreHelper = require('../Helper/StoreHelper')
+const StoreHandler = require('./functions/Store/handler.js')
 
-router.post('/', StoreHelper.CreateStore)
+router.post('/', StoreHandler.CreateStoreInformation)
+
 router.post('/time', StoreHelper.CreateStoreOpeningTime)
 router.post('/merchandise', StoreHelper.CreateStoreMerchandise)
 router.post('/telephone', StoreHelper.CreateStoreTelePhone)

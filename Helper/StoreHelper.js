@@ -2,38 +2,67 @@ const faker = require('faker/locale/ko')
 const pool = require('../config/db')
 
 module.exports = {
-  CreateStore: async (req, res, next) => {
+  readAllStore: async (req, res, next) => {
+    // 평점평균
+    // 하트 눌렀는지
+    // 72번
+    // 상점이름
+    // 평가인원
+    // 사진
+    try {
+      // let query = await pool.query(
+      //   "SELECT s.store_indexholder AS store_number, s.store_name, s.store_image, s.vote_grade_average, s.vote_grade_count, s.store_id \
+      //   FROM store_information AS s, users AS u, starred_store AS ss \
+      //   WHERE s.is_visible = 1 AND u.enabled = 1, AND ss.is_isvisible = 1 \"
+      // )
+
+      let [response] = await pool.query(
+        'SELECT * FROM `boards` \
+                WHERE `board_id`= last_insert_id()'
+      )
+
+      console.log('점포 리스트 조회 완료: ', response[0])
+      res.status(201).json(response[0])
+    } catch (e) {
+      res.status(503).send(e)
+      throw new Error('점포 리스트 조회 중 오류 발생')
+    }
+  },
+  createStoreInformation: async (data) => {
     /**
       * URI: [POST, /api/store]
+      * Request Body: {
+      *   "store_name": "...",
+      *   "store_number": ...,
+      *   "store_type": [과일, 채소, 수산],
+      * }
       */
-
-    // let userId = req.passport.userId;
-    let userId = 18
-    let storeName = faker.company.companyName()
-    let storeIndexHolder = 1
-    let storeMaster = userId
-    let storeType = ['과일', '채소', '수산']
     try {
-
-      let query = await pool.query(
+      let create = await pool.execute(
         'INSERT INTO `store_information` \
-                (`store_indexholder`, `store_name`, `store_type`, `store_master`) \
-                VALUES (?, ?, ?, ?)', [storeIndexHolder, storeName, storeType[0], storeMaster]
+        (`store_indexholder`, `store_name`, `store_type`, `store_master`) \
+        VALUES (?, ?, ?, ?)', [data.store_number, data.store_name, data.store_type, data.member_id]
       )
 
       let [response] = await pool.query(
         'SELECT * FROM `store_information` \
-                WHERE `store_id`= last_insert_id()'
+        WHERE `store_id`= last_insert_id()'
       )
 
       console.log('상점 생성 완료: ', response[0])
-      res.status(201).json(response[0])
+      return response[0]
     } catch (e) {
-      res.status(503).send(e)
       throw new Error('상점 생성 중 오류 발생')
     }
   },
-
+  getCreateStoreInformaitionDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_type': req.body.store_type,
+      'store_name': req.body.store_name,
+      'store_number': req.body.store_number,
+    }
+  },
   CreateStoreOpeningTime: async (req, res, next) => {
     /**
       * URI: [POST, /api/store/time]
