@@ -1,5 +1,5 @@
 module.exports = {
-  category: {
+  Category: {
     '100': '식량작물',
     '200': '채소류',
     '300': '특용작물',
@@ -7,7 +7,7 @@ module.exports = {
     '500': '축산물',
     '600': '수산물',
   },
-  item: {
+  Item: {
     '111': '쌀',
     '112': '찹쌀',
     '141': '콩',
@@ -94,7 +94,7 @@ module.exports = {
     '653': '전복',
     '654': '새우',
   },
-  itemCategory: {
+  ItemCategory: {
     '111': {
       '01': '일반계',
       '05': '햇일반계'
@@ -444,7 +444,7 @@ module.exports = {
       '01': '흰다리(수입)}'
     },
   },
-  graderank: {
+  Graderank: {
     '01': {
       'name': '1등급',
       'rank': '1'
@@ -510,7 +510,7 @@ module.exports = {
       'rank': '2'
     }
   },
-  grade: {
+  Grade: {
     '11101': {
       'normal-grade': ['04', '05'],
       'eco-friendly-grade': ['07', '08']
@@ -1223,6 +1223,34 @@ module.exports = {
       'normal-grade': ['05'],
       'eco-friendly-grade': null
     },
+  },
+  Location: {
+    Wholesale: {
+      'Seoul': '1101',
+      'Busan': '2100',
+      'Daegu': '2200',
+      'Gwangju': '2401',
+      'Daejeon': '2501'
+    },
+    Retail: {
+      'Seoul': '1101',
+      'Busan': '2100',
+      'Daegu': '2200',
+      'Incheon': '2300',
+      'Gwangju': '2401',
+      'Daejeon': '2501',
+      'Ulsan': '2601',
+      'Suwon': '3111',
+      'Chuncheon': '3211',
+      'Cheongju': '3311',
+      'Jeonju': '3511',
+      'Pohang': '3711',
+      'Jeju': '3911',
+      'Uijeongbu': '3113',
+      'Suncheon': '3613',
+      'Andong': '3714',
+      'Changwon': '3814',
+      'Yongin': '3145'
+    }
   }
 }
-
