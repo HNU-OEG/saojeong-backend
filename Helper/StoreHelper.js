@@ -2,7 +2,7 @@ const faker = require('faker/locale/ko')
 const pool = require('../config/db')
 
 module.exports = {
-  readOrderByStar: async (data) => {
+  readAllOrderByGrade: async (data) => {
     try {
       let storeList = pool.query(
         'SELECT \
@@ -16,7 +16,7 @@ module.exports = {
         FROM `store_information` AS `si` \
         WHERE `is_visible` = 1 \
         ORDER BY `vote_grade_average` DESC', [data.member_id])
-        
+
       console.log('평점순 점포 리스트 조회 완료: ', storeList)
       return storeList
     } catch (e) {
@@ -24,9 +24,49 @@ module.exports = {
       throw new Error('평점 순 점포 리스트 조회 중 오류 발생')
     }
   },
-  getReadOrderByStarDto: async (req) => {
+  getAllReadOrderByGradeDto: async (req) => {
     return {
       'member_id': req.user.member_id,
+    }
+  },
+  getSqlForReadOrderByType: async (data) => {
+    let sql = 
+    'SELECT \
+      `store_indexholder` AS `store_number`, \
+      `store_name`, `vote_grade_average`, \
+      `vote_grade_count`, `store_id`, `store_intro`, \
+      IF((SELECT `created_at` FROM `starred_store` AS ss \
+      WHERE `member_id` = ? AND `ss`.`store_id` = `si`.`store_id` AND `is_visible` = 1 LIMIT 1) \
+      IS NOT NULL, TRUE, FALSE) AS `starred` \
+    FROM `store_information` AS `si` \
+    WHERE `is_visible` = 1 AND `store_type` = ? \
+    ORDER BY ?'
+    if (data.orderby === 'vote_grade_average') {
+      sql += ' DESC'
+    } else if (data.orderby === 'store_name') {
+      sql += ' ASC'
+    }
+    data.sql = sql
+    return data
+  },
+  readOrderByType: async (data) => {
+    try {
+      let storeList = pool.query(data.sql, [data.member_id, data.type, data.orderby])
+
+      console.log('평점순 점포 리스트 조회 완료: ', storeList)
+      return storeList
+    } catch (e) {
+      console.log('평점 순 점포 리스트 조회 중 오류 발생' , e)
+      throw new Error('평점 순 점포 리스트 조회 중 오류 발생')
+    }
+  },
+  getReadOrderByTypeDto: async (req) => {
+    let type = {'fruits': '과일', 'vegetables': '채소', 'seafoods': '수산',}
+    let orderby = {'grade': 'vote_grade_average', 'name': 'store_name',}
+    return {
+      'member_id': req.user.member_id,
+      'type': type[req.params.type],
+      'orderby': orderby[req.params.orderby]
     }
   },
   createStoreInformation: async (data) => {

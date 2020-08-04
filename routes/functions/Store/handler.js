@@ -1,9 +1,10 @@
 const StoreHelper = require('../../../Helper/StoreHelper')
+const { getSqlForReadOrderByType } = require('../../../Helper/StoreHelper')
 
 module.exports = {
   CreateStoreInformation: async (req, res, next) => {
     /**
-      * URI: [POST, /api/store]
+      * URI: [POST, /api/store]]
       * Request Body: {
       *   "store_name": "...",
       *   "store_number": ...,
@@ -16,12 +17,26 @@ module.exports = {
       .then(result => res.status(201).send(result))
       .catch(err => res.status(503).send(err))
   },
-  ReadAllStoreOrderByStar: async (req, res, next) => {
+  ReadAllStoresOrderByGrade: async (req, res, next) => {
     /**
      * URI: [GET, /api/store]
      */
-    let data = await StoreHelper.getReadOrderByStarDto(req)
-    let readAllStore = StoreHelper.readOrderByStar(data)
+    let data = await StoreHelper.getAllReadOrderByGradeDto(req)
+    let readAllStore = StoreHelper.readAllOrderByGrade(data)
+    readAllStore
+      .then(result => res.status(201).json(result[0]))
+      .catch(err => res.status(503).send(err))
+  },
+  ReadStoresOrderByType: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/store/type/:type/orderby/:orderby]
+     * type: fruits, vegetables, seafoods
+     * orderby: vote, name
+     */
+    let data = await StoreHelper.getReadOrderByTypeDto(req)
+    data = await getSqlForReadOrderByType(data)
+    let readAllStore = StoreHelper.readOrderByType(data)
+    console.log(readAllStore)
     readAllStore
       .then(result => res.status(201).json(result[0]))
       .catch(err => res.status(503).send(err))
@@ -31,7 +46,8 @@ module.exports = {
       * URI: [POST, /api/store/:storeId/star]
       */
     let data = await StoreHelper.getRegisterStarredStoreDto(req)
-    let registerStar = StoreHelper.registerStarredStore(data)
+    let sql = await StoreHelper.getSql(data)
+    let registerStar = StoreHelper.registerStarredStore(sql)
     registerStar
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
