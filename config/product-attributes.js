@@ -509,5 +509,720 @@ module.exports = {
       'name': 'S과',
       'rank': '2'
     }
+  },
+  grade: {
+    '11101': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '11105': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '11201': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '14101': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '14102': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '14103': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '14200': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '14201': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '14300': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '14301': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '14401': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '15100': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '15200': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '15201': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '15202': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '21101': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '21102': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '21103': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '21106': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '21200': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '21300': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '21401': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '21402': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '21500': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '21600': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '22100': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '22200': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '22301': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '22302': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '22303': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '22401': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '22402': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '22500': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '22600': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '23101': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '23102': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '23103': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '23106': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '23200': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '23201': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '23202': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '23210': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '23300': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24100': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24101': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24102': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24103': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24110': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '24200': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '24202': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '24203': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24300': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24401': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24402': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24403': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24404': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24406': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24407': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24408': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24411': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24412': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24500': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '24502': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '24510': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '24600': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '24602': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '24700': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '24701': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '24800': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '24801': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '25200': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '25300': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '25500': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '25600': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '25700': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '25801': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '25803': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '25805': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '25901': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '25903': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '31201': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '31202': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '31203': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '31301': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '31302': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '31401': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '31402': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '31500': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '31501': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '31600': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '31700': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '31800': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '31900': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '41101': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41105': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '41106': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '41107': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41201': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '41202': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41203': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41204': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41301': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41304': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41305': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41401': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '41402': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41403': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41406': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41407': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41408': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41409': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41410': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41411': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41500': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '41501': {
+      'normal-grade': ['13', '14', '15', '16'],
+      'eco-friendly-grade': null
+    },
+    '41502': {
+      'normal-grade': ['13', '14', '15', '16'],
+      'eco-friendly-grade': null
+    },
+    '41600': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41802': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41901': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '41902': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42002': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42102': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42103': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42104': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42105': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42106': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42201': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': ['07', '08']
+    },
+    '42300': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42400': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42500': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '42600': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '42700': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '42800': {
+      'normal-grade': ['04', '05'],
+      'eco-friendly-grade': null
+    },
+    '51211': {
+      'normal-grade': ['01', '03'],
+      'eco-friendly-grade': null
+    },
+    '51212': {
+      'normal-grade': ['01', '03'],
+      'eco-friendly-grade': null
+    },
+    '51213': {
+      'normal-grade': ['01', '03'],
+      'eco-friendly-grade': null
+    },
+    '51214': {
+      'normal-grade': ['01'],
+      'eco-friendly-grade': null
+    },
+    '51215': {
+      'normal-grade': ['01'],
+      'eco-friendly-grade': null
+    },
+    '51221': {
+      'normal-grade': ['10', '11'],
+      'eco-friendly-grade': null
+    },
+    '51222': {
+      'normal-grade': ['10', '11'],
+      'eco-friendly-grade': null
+    },
+    '51223': {
+      'normal-grade': ['10', '11'],
+      'eco-friendly-grade': null
+    },
+    '51231': {
+      'normal-grade': ['10', '11'],
+      'eco-friendly-grade': null
+    },
+    '51232': {
+      'normal-grade': ['10', '11'],
+      'eco-friendly-grade': null
+    },
+    '51233': {
+      'normal-grade': ['10', '11'],
+      'eco-friendly-grade': null
+    },
+    '51400': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '51401': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '51402': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '51403': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '51404': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '51502': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': ['07', '12']
+    },
+    '51600': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': ['07', '12']
+    },
+    '53500': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '61101': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61102': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61103': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61104': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61201': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61301': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61302': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61501': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61502': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61901': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '61902': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '63800': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '63901': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '63902': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '64000': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '64100': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '64101': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '64200': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '64400': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '64901': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '64904': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '65000': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '65100': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '65200': {
+      'normal-grade': ['04'],
+      'eco-friendly-grade': null
+    },
+    '65300': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
+    '65401': {
+      'normal-grade': ['05'],
+      'eco-friendly-grade': null
+    },
   }
 }
+
