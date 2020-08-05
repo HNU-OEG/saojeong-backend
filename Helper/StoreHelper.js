@@ -152,15 +152,16 @@ module.exports = {
       'store_id': req.params.storeId,
     }
   },
-  createOpeningTime: async (req, sql) => {
+  createOpeningTime: async (data) => {
+    let sql = data.sql
+    let store_id = data.store_id
     try {
-      
       let create = await pool.execute(sql)
       
       let [response] = await pool.query(
         'SELECT `weekday`, TIME_FORMAT(`start_hour`, "%H:%i") AS `open`, TIME_FORMAT(`end_hour`, "%H:%i") AS `close` FROM `store_opening_hours` \
         WHERE `store_id`= ? ORDER BY `weekday` ASC', 
-        [req.params.storeId]
+        [store_id]
       )
 
       console.log('상점 영업 시간 생성 완료: ', response)
@@ -170,18 +171,25 @@ module.exports = {
       throw new Error('상점 영업 시간 생성 중 오류 발생', e)
     }
   },
-  getSqlForCreateOpeningTIme: async (req) => {
+  getCreateOpeningTimeDto: async (req) => {
+    return {
+      'store_id': req.params.storeId,
+      'body': req.body
+    }
+  },
+  getSqlForCreateOpeningTIme: async (data) => {
     let weekday = { 'sun': 1, 'mon': 2, 'tue': 3, 'wed': 4, 'thu': 5, 'fri': 6, 'sat': 7 }
     let sql = 'INSERT INTO `store_opening_hours` \
               (`store_id`, `weekday`, `start_hour`, `end_hour`) VALUES '
 
     let valueList = []
-    for (let row in req) {
-      let day = req.body[row]
-      valueList.push('(' + req.params.storeId + ', ' + weekday[row] + ', TIME("' + day.open + '"), TIME("' + day.close + '"))')
+    for (let row in data.body) {
+      let day = data.body[row]
+      valueList.push('(' + data.store_id + ', ' + weekday[row] + ', TIME("' + day.open + '"), TIME("' + day.close + '"))')
     }
     sql += valueList.join(', ')
-    return sql
+    data.sql = sql
+    return data
   },
   CreateStoreMerchandise: async (req, res, next) => {
     /**
@@ -218,13 +226,15 @@ module.exports = {
 
   },
   createTelephone: async (data) => {
-    console.log(data.sql)
+    let sql = data.sql
+    let store_id = data.store_id
+
     try {
 
-      let create = await pool.execute(data.sql)
+      let create = await pool.execute(sql)
       let [response] = await pool.query(
         'SELECT * FROM `store_telephone` \
-        WHERE `store_id`= ? AND `is_visible` = 1', [data.store_id]
+        WHERE `store_id`= ? AND `is_visible` = 1', [store_id]
       )
 
       console.log('번호 등록  완료: ', response)
@@ -259,7 +269,7 @@ module.exports = {
     let q1 = data.kindness
     let q2 = data.merchandise
     let q3 = data.price
-    
+
     try {
       let query = await pool.execute(
         'INSERT INTO `store_vote_grade` \

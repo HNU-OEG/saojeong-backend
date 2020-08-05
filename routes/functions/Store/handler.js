@@ -95,9 +95,9 @@ module.exports = {
       *   },
       * }
       */
-
-    let sql = await StoreHelper.getSqlForCreateOpeningTIme(req)
-    let createOpeningTime = StoreHelper.createOpeningTime(req, sql)
+    let data = await StoreHelper.getCreateOpeningTimeDto(req)
+    let sql = await StoreHelper.getSqlForCreateOpeningTIme(data)
+    let createOpeningTime = StoreHelper.createOpeningTime(data)
     createOpeningTime
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
