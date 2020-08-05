@@ -36,7 +36,6 @@ module.exports = {
     let data = await StoreHelper.getReadOrderByTypeDto(req)
     data = await getSqlForReadOrderByType(data)
     let readAllStore = StoreHelper.readOrderByType(data)
-    console.log(readAllStore)
     readAllStore
       .then(result => res.status(201).json(result[0]))
       .catch(err => res.status(503).send(err))
@@ -46,8 +45,7 @@ module.exports = {
       * URI: [POST, /api/store/:storeId/star]
       */
     let data = await StoreHelper.getRegisterStarredStoreDto(req)
-    let sql = await StoreHelper.getSql(data)
-    let registerStar = StoreHelper.registerStarredStore(sql)
+    let registerStar = StoreHelper.registerStarredStore(data)
     registerStar
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
@@ -101,6 +99,21 @@ module.exports = {
     let sql = await StoreHelper.getSqlForCreateOpeningTIme(req)
     let createOpeningTime = StoreHelper.createOpeningTime(req, sql)
     createOpeningTime
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  CreateStoreTelephone: async (req, res, next) => {
+    /**
+     * URI: [POST, /api/store/telephone]
+     * Request Body: {
+     *  "1": "...",
+     *  "2": "..."
+     * }
+     */
+    let data = await StoreHelper.getCreateTelephoneDto(req)
+    data = await StoreHelper.getSqlForCreateTelephone(data)
+    let createTelephone = StoreHelper.createTelephone(data)
+    createTelephone
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },

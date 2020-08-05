@@ -176,14 +176,13 @@ module.exports = {
               (`store_id`, `weekday`, `start_hour`, `end_hour`) VALUES '
 
     let valueList = []
-    for (let row in req.body) {
+    for (let row in req) {
       let day = req.body[row]
       valueList.push('(' + req.params.storeId + ', ' + weekday[row] + ', TIME("' + day.open + '"), TIME("' + day.close + '"))')
     }
     sql += valueList.join(', ')
     return sql
   },
-
   CreateStoreMerchandise: async (req, res, next) => {
     /**
       * URI: [POST, /api/store/merchandise]
@@ -218,38 +217,42 @@ module.exports = {
     }
 
   },
-
-  CreateStoreTelePhone: async (req, res, next) => {
-    /**
-      * URI: [POST, /api/store/telephone]
-      */
-    let storeId = 1
-
+  createTelephone: async (data) => {
+    console.log(data.sql)
     try {
 
-      for (let i = 1; i <= 7; i++) {
-        let telephone = faker.phone.phoneNumber()
-
-        let query = await pool.query(
-          'INSERT INTO `store_telephone` \
-                    (`store_id`, `telephone`) \
-                    VALUES (?, ?)', [storeId, telephone]
-        )
-      }
-
+      let create = await pool.execute(data.sql)
       let [response] = await pool.query(
-        'SELECT `telephone`, `is_verified` FROM `store_telephone` \
-                WHERE `store_id`= ?', [storeId]
+        'SELECT * FROM `store_telephone` \
+        WHERE `store_id`= ? AND `is_visible` = 1', [data.store_id]
       )
 
-      console.log('상품 등록 완료: ', response)
-      res.status(201).json(response)
+      console.log('번호 등록  완료: ', response)
+      return response
     } catch (e) {
-      res.status(503).send(e)
-      throw new Error('상품 등록 중 오류 발생')
+      console.log('번호 등록 중 오류 발생', e)
+      throw new Error('번호 등록 중 오류 발생')
     }
   },
+  getCreateTelephoneDto: async (req) => {   
+    return {
+      'store_id' : req.params.storeId,
+      'body': req.body,
+    }
+  },
+  getSqlForCreateTelephone: async (data) => {
+    let sql = 'INSERT INTO `store_telephone` \
+              (`store_id`, `telephone`) VALUES '
 
+    let valueList = []
+    for (let row in data.body) {
+      let telephone = data.body[row]
+      valueList.push('(' + data.store_id + ', "' + telephone + '")')
+    }
+    sql += valueList.join(', ')
+    data.sql = sql
+    return data
+  },
   CreateVoteGrade: async (req, res, next) => {
     /**
       * URI: [POST, /api/store/:storeId/votegrade]
