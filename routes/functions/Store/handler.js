@@ -96,7 +96,7 @@ module.exports = {
       * }
       */
     let data = await StoreHelper.getCreateOpeningTimeDto(req)
-    let sql = await StoreHelper.getSqlForCreateOpeningTIme(data)
+    data = await StoreHelper.getSqlForCreateOpeningTIme(data)
     let createOpeningTime = StoreHelper.createOpeningTime(data)
     createOpeningTime
       .then(result => res.status(201).json(result))
@@ -120,6 +120,36 @@ module.exports = {
   CreateVoteGrade: async (req, res, next) => {
     /**
      * URI: [POST, /api/store/:storeId/votegrade]
+     * Request Body: {
+     *  "kindess": ...,
+     *  "merchandise": ...,
+     *  "price": ... 
+     * }
+     */
+    let data = await StoreHelper.getVoteGradeDto(req)
+    let createVoteGrade = StoreHelper.createVoteGrade(data)
+    createVoteGrade
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  EditVoteGrade: async (req, res, next) => {
+    /**
+     * URI: [PUT, /api/store/:storeId/votegrade]
+     * Request Body: {
+     *  "kindess": ...,
+     *  "merchandise": ...,
+     *  "price": ... 
+     * }
+     */
+    let data = await StoreHelper.getVoteGradeDto(req)
+    let editVoteGrade = StoreHelper.editVoteGrade(data)
+    editVoteGrade
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  CreateStoreMerchandise: async (req, res, next) => { // 단위?, 가격? 
+    /**
+     * URI: [POST, /api/store/:storeId/merchandise]
      * Request Body: {
      *  "kindess": ...,
      *  "merchandise": ...,

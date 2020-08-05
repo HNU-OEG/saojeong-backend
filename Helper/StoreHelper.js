@@ -3,6 +3,7 @@ const pool = require('../config/db')
 
 module.exports = {
   readAllOrderByGrade: async (data) => {
+    let member_id  = data.member_id
     try {
       let storeList = pool.query(
         'SELECT \
@@ -15,7 +16,7 @@ module.exports = {
           IS NOT NULL, TRUE, FALSE) AS `starred` \
         FROM `store_information` AS `si` \
         WHERE `is_visible` = 1 \
-        ORDER BY `vote_grade_average` DESC', [data.member_id])
+        ORDER BY `vote_grade_average` DESC', [member_id])
 
       console.log('평점순 점포 리스트 조회 완료: ', storeList)
       return storeList
@@ -30,6 +31,7 @@ module.exports = {
     }
   },
   getSqlForReadOrderByType: async (data) => {
+    let orderby = data.orderby
     let sql = 
     'SELECT \
       `store_indexholder` AS `store_number`, \
@@ -41,17 +43,24 @@ module.exports = {
     FROM `store_information` AS `si` \
     WHERE `is_visible` = 1 AND `store_type` = ? \
     ORDER BY ?'
-    if (data.orderby === 'vote_grade_average') {
+
+    if (orderby === 'vote_grade_average') {
       sql += ' DESC'
-    } else if (data.orderby === 'store_name') {
+    } else if (orderby === 'store_name') {
       sql += ' ASC'
     }
+
     data.sql = sql
     return data
   },
   readOrderByType: async (data) => {
+    let member_id = data.member_id
+    let orderby = data.orderby
+    let type = data.type
+    let sql = data.sql
+
     try {
-      let storeList = pool.query(data.sql, [data.member_id, data.type, data.orderby])
+      let storeList = pool.query(sql, [member_id, type, orderby])
 
       console.log('평점순 점포 리스트 조회 완료: ', storeList)
       return storeList
@@ -70,11 +79,16 @@ module.exports = {
     }
   },
   createStoreInformation: async (data) => {
+    let member_id = data.member_id
+    let store_number = data.store_number
+    let store_name = data.store_name
+    let store_type = data.store_type
+
     try {
       let create = await pool.execute(
         'INSERT INTO `store_information` \
         (`store_indexholder`, `store_name`, `store_type`, `store_master`) \
-        VALUES (?, ?, ?, ?)', [data.store_number, data.store_name, data.store_type, data.member_id]
+        VALUES (?, ?, ?, ?)', [store_number, store_name, store_type, member_id]
       )
 
       let [response] = await pool.query(
@@ -98,16 +112,18 @@ module.exports = {
     }
   },
   registerStarredStore: async (data) => {
+    let member_id = data.member_id
+    let store_id = data.store_id
     try {
       let register = await pool.execute(
         'INSERT INTO `starred_store` (`member_id`, `store_id`) \
-        VALUES (?, ?)', [data.member_id, data.store_id]
+        VALUES (?, ?)', [member_id, store_id]
       )
 
       let [response] = await pool.query(
         'SELECT * FROM `starred_store` \
         WHERE `member_id`= ? AND `store_id` = ? AND `is_visible` = 1',
-        [data.member_id, data.store_id]
+        [member_id, store_id]
       )
 
       console.log('점포 좋아요 완료: ', response[0])
@@ -124,19 +140,22 @@ module.exports = {
     }
   },
   unRegisterStarredStore: async (data) => {
+    let member_id = data.member_id
+    let store_id = data.store_id
+
     try {
       let unRegister = await pool.execute(
         'UPDATE `starred_store` \
         SET `is_visible` = 0, `removed_at` = CURRENT_TIMESTAMP() \
         WHERE `member_id` = ? AND `store_id` = ? AND `is_visible` = 1', 
-        [data.member_id, data.store_id]
+        [member_id, store_id]
       )
 
       let [response] = await pool.query(
         'SELECT * FROM `starred_store` \
         WHERE `member_id`= ? AND `store_id` = ? AND `is_visible` = 0 \
         ORDER BY `removed_at` DESC LIMIT 1',
-        [data.member_id, data.store_id]
+        [member_id, store_id]
       )
 
       console.log('점포 좋아요 취소 완료: ', response[0])
@@ -178,16 +197,20 @@ module.exports = {
     }
   },
   getSqlForCreateOpeningTIme: async (data) => {
+    let body = data.body
+    let store_id = data.store_id
+
     let weekday = { 'sun': 1, 'mon': 2, 'tue': 3, 'wed': 4, 'thu': 5, 'fri': 6, 'sat': 7 }
     let sql = 'INSERT INTO `store_opening_hours` \
               (`store_id`, `weekday`, `start_hour`, `end_hour`) VALUES '
 
     let valueList = []
-    for (let row in data.body) {
-      let day = data.body[row]
-      valueList.push('(' + data.store_id + ', ' + weekday[row] + ', TIME("' + day.open + '"), TIME("' + day.close + '"))')
+    for (let row in body) {
+      let day = body[row]
+      valueList.push('(' + store_id + ', ' + weekday[row] + ', TIME("' + day.open + '"), TIME("' + day.close + '"))')
     }
     sql += valueList.join(', ')
+    
     data.sql = sql
     return data
   },
@@ -230,7 +253,6 @@ module.exports = {
     let store_id = data.store_id
 
     try {
-
       let create = await pool.execute(sql)
       let [response] = await pool.query(
         'SELECT * FROM `store_telephone` \
@@ -290,50 +312,49 @@ module.exports = {
       throw new Error('평점 등록 중 오류 발생')
     }
   },
-  getCreateVoteGradeDto: async (req) => {
+  getVoteGradeDto: async (req) => {
     return {
       'member_id': req.user.member_id,
       'store_id': req.params.storeId,
       'kindness': req.body.kindness,
       'merchandise': req.body.merchandise,
       'price': req.body.price,
-
     }
   },
-  UpdateVoteGrade: async (req, res, next) => {
+  editVoteGrade: async (data) => {
     /**
       * URI: [PUT, /api/store/:storeId/votegrade]
       */
-
-    let storeId = req.params.storeId
-    let memberId = 18
-    let grade1 = 4.5
-    let grade2 = 4.5
-    let grade3 = 4.5
+    let store_id = data.store_id
+    let member_id = data.member_id
+    let q1 = data.kindness
+    let q2 = data.merchandise
+    let q3 = data.price
 
     try {
-
       let removeVoteGrade = await pool.execute(
         'UPDATE `store_vote_grade` \
-                SET `removed_at` = CURRENT_TIMESTAMP(), `is_available` = 0 \
-                WHERE `member_id` = ? AND `store_id` = ? AND `is_available` = 1', [memberId, storeId]
+        SET `removed_at` = CURRENT_TIMESTAMP(), `is_available` = 0 \
+        WHERE `member_id` = ? AND `store_id` = ? AND `is_available` = 1', 
+        [member_id, store_id]
       )
 
-      let createVoteGrade = await pool.execute(
+      let editVoteGrade = await pool.execute(
         'INSERT INTO `store_vote_grade` \
-                (`store_id`, `member_id`, `question1`, `question2`, `question3`) \
-                VALUES (?, ?, ?, ?, ?)', [storeId, memberId, grade1, grade2, grade3]
+        (`store_id`, `member_id`, `question1`, `question2`, `question3`) \
+        VALUES (?, ?, ?, ?, ?)', [store_id, member_id, q1, q2, q3]
       )
 
       let [response] = await pool.query(
         'SELECT * FROM `store_vote_grade` \
-                WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1', [memberId, storeId]
+        WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1', 
+        [member_id, store_id]
       )
 
       console.log('평점 수정 완료: ', response[0])
-      res.status(201).json(response)[0]
+      return response[0]
     } catch (e) {
-      res.status(503).send(e)
+      console.log('평점 수정 중 오류 발생', e)
       throw new Error('평점 수정 중 오류 발생')
     }
   },
