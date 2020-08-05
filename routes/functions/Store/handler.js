@@ -117,4 +117,19 @@ module.exports = {
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
+  CreateVoteGrade: async (req, res, next) => {
+    /**
+     * URI: [POST, /api/store/:storeId/votegrade]
+     * Request Body: {
+     *  "kindess": ...,
+     *  "merchandise": ...,
+     *  "price": ... 
+     * }
+     */
+    let data = await StoreHelper.getCreateVoteGradeDto(req)
+    let createVoteGrade = StoreHelper.createVoteGrade(data)
+    createVoteGrade
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
 }

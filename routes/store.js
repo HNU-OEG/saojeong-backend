@@ -10,10 +10,10 @@ router.post('/:storeId/star', StoreHandler.RegisterStarredStore)
 router.delete('/:storeId/star', StoreHandler.UnRegisterStarredStore)
 router.post('/:storeId/time', StoreHandler.CreateOpeningTime)
 router.post('/:storeId/telephone', StoreHandler.CreateStoreTelephone)
+router.post('/:storeId/votegrade', StoreHandler.CreateVoteGrade)
 
 
 router.post('/merchandise', StoreHelper.CreateStoreMerchandise)
-router.post('/:storeId/votegrade', StoreHelper.CreateVoteGrade)
 router.put('/:storeId/votegrade', StoreHelper.UpdateVoteGrade)
 
 router.post('/ordertype', StoreHelper.CreateOderType)

@@ -253,34 +253,41 @@ module.exports = {
     data.sql = sql
     return data
   },
-  CreateVoteGrade: async (req, res, next) => {
-    /**
-      * URI: [POST, /api/store/:storeId/votegrade]
-      * */
-    let storeId = req.params.storeId
-    let memberId = 18
-    let grade1 = 4.5
-    let grade2 = 4.5
-    let grade3 = 4.5
-
+  createVoteGrade: async (data) => {
+    let store_id = data.store_id
+    let member_id = data.member_id
+    let q1 = data.kindness
+    let q2 = data.merchandise
+    let q3 = data.price
+    
     try {
-
       let query = await pool.execute(
         'INSERT INTO `store_vote_grade` \
-                    (`store_id`, `member_id`, `question1`, `question2`, `question3`) \
-                    VALUES (?, ?, ?, ?, ?)', [storeId, memberId, grade1, grade2, grade3]
+        (`store_id`, `member_id`, `question1`, `question2`, `question3`) \
+        VALUES (?, ?, ?, ?, ?)', [store_id, member_id, q1, q2, q3]
       )
 
       let [response] = await pool.query(
         'SELECT * FROM `store_vote_grade` \
-                WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1', [memberId, storeId]
+        WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1', 
+        [member_id, store_id]
       )
 
       console.log('평점 등록 완료: ', response[0])
-      res.status(201).json(response)[0]
+      return response[0]
     } catch (e) {
-      res.status(503).send(e)
+      console.log('평점 등록 중 오류 발생', e)
       throw new Error('평점 등록 중 오류 발생')
+    }
+  },
+  getCreateVoteGradeDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_id': req.params.storeId,
+      'kindness': req.body.kindness,
+      'merchandise': req.body.merchandise,
+      'price': req.body.price,
+
     }
   },
   UpdateVoteGrade: async (req, res, next) => {
