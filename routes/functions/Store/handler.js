@@ -1,5 +1,4 @@
 const StoreHelper = require('../../../Helper/StoreHelper')
-const { getSqlForReadOrderByType } = require('../../../Helper/StoreHelper')
 
 module.exports = {
   CreateStoreInformation: async (req, res, next) => {
@@ -34,7 +33,7 @@ module.exports = {
      * orderby: vote, name
      */
     let data = await StoreHelper.getReadOrderByTypeDto(req)
-    data = await getSqlForReadOrderByType(data)
+    data = await StoreHelper.getSqlForReadOrderByType(data)
     let readAllStore = StoreHelper.readOrderByType(data)
     readAllStore
       .then(result => res.status(201).json(result[0]))
@@ -159,6 +158,42 @@ module.exports = {
     let data = await StoreHelper.getCreateVoteGradeDto(req)
     let createVoteGrade = StoreHelper.createVoteGrade(data)
     createVoteGrade
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  CreateOrderType: async (req, res, next) => {
+    /**
+      * URI: [POST, /api/store/ordertype]
+      * Request Body: {
+      *   "1": "...",
+      *   "2": "..."
+      * }
+      */
+    let data = await StoreHelper.getCreateOrderTypeDto(req)
+    data = await StoreHelper.getSqlForCreateOrderType(data)
+    let createOderType = StoreHelper.createOrderType(data)
+    createOderType
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  RegisterOrderTypeOnStore: async (req, res,next)=> {
+    /**
+     * URI: [POST, /api/store/:storeId/ordertype]
+     * Request Body: {
+     *  "1": {
+     *    "id": ...,
+     *    "order_type": "..."
+     *  },
+     *  "2": {
+     *    "id": ...,
+     *    "order_type": "..."
+     *  }
+     * }
+     */
+    let data = await StoreHelper.getRegisterOrderTypeDto(req)
+    data = await StoreHelper.getSqlForRegisterOrderType(data)
+    let registerOrderType = StoreHelper.registerOrderTypeOnStore(data)
+    registerOrderType
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },

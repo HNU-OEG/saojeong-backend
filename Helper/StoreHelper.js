@@ -210,43 +210,9 @@ module.exports = {
       valueList.push('(' + store_id + ', ' + weekday[row] + ', TIME("' + day.open + '"), TIME("' + day.close + '"))')
     }
     sql += valueList.join(', ')
-    
+
     data.sql = sql
     return data
-  },
-  CreateStoreMerchandise: async (req, res, next) => {
-    /**
-      * URI: [POST, /api/store/merchandise]
-      */
-
-
-    let storeId = 1
-    try {
-
-      for (let i = 1; i <= 7; i++) {
-        let name = faker.name.lastName()
-        let price = faker.commerce.price()
-        let lastUpdatedIp = faker.internet.ip()
-
-        let query = await pool.query(
-          'INSERT INTO `store_merchandise` \
-                    (`store_id`, `name`, `price`, `last_updated_ip`) \
-                    VALUES (?, ?, ?, ?)', [storeId, name, price, lastUpdatedIp]
-        )
-      }
-
-      let [response] = await pool.query(
-        'SELECT `name`, `price` FROM `store_merchandise` \
-                WHERE `store_id`= ?', [storeId]
-      )
-
-      console.log('상품 등록 완료: ', response)
-      res.status(201).json(response)
-    } catch (e) {
-      res.status(503).send(e)
-      throw new Error('상품 등록 중 오류 발생')
-    }
-
   },
   createTelephone: async (data) => {
     let sql = data.sql
@@ -358,72 +324,115 @@ module.exports = {
       throw new Error('평점 수정 중 오류 발생')
     }
   },
+  createOrderType: async (data) => {
+    console.log(data)
+    try {
+      let create = await pool.execute(data.sql)
 
-  CreateOderType: async (req, res, next) => {
+      let [response] = await pool.query(
+        'SELECT * FROM `order_type` WHERE `is_visible` = 1'
+      )
+
+      console.log('거래방식 생성 완료: ', response)
+      return response
+    } catch (e) {
+      console.log('거래방식 생성 중 오류 발생', e)
+      throw new Error('거래방식 생성 중 오류 발생')
+    }
+  },
+  getCreateOrderTypeDto: async (req) => {
+    return {
+      'author': req.user.member_id,
+      'body': req.body
+    }
+  },
+  getSqlForCreateOrderType: async (data) => {
+    let body = data.body
+    let author = data.author
+    
+    let sql = 'INSERT INTO `order_type` (`name`, `author`) VALUES '
+    
+    let valueList = []
+    for (let row in body) {
+      valueList.push('(\'' + body[row] + '\', \'' + author + '\')')
+    }
+    
+    sql += valueList.join(', ')
+    data.sql = sql
+    return data
+  },
+  registerOrderTypeOnStore: async (data) => {
+    try {
+      let insertQuery = await pool.execute(data.sql)
+
+      let [response] = await pool.query(
+        'SELECT * FROM `store_to_ordertype` \
+        WHERE `store_id`= ?', [data.store_id]
+      )
+
+      console.log('거래방식 매핑 완료: ', response)
+      return response
+    } catch (e) {
+      console.log('거래방식 매핑 중 오류 발생', e)
+      throw new Error('거래방식 매핑 중 오류 발생')
+    }
+  },
+  getRegisterOrderTypeDto: async (req) => {
+    return {
+      'store_id': req.params.storeId,
+      'body': req.body
+    }
+  },
+  getSqlForRegisterOrderType: async (data) => {
+    let store_id = data.store_id
+    let body = data.body
+    
+    let sql = 'INSERT INTO `store_to_ordertype` (`store_id`, `ordertype_id`) VALUES '
+    
+    let valueList = []
+    for (let row in body) {
+      let id = body[row].id
+      valueList.push('(\'' + store_id + '\', ' + id + ')')
+    }
+    sql += valueList.join(', ')
+    data.sql = sql
+    return data
+  },
+
+
+  // 상품 품목 관련 로직이 정의 되어야합니다
+  CreateStoreMerchandise: async (req, res, next) => {
     /**
-      * URI: [PUT, /api/ordertype?name=]
+      * URI: [POST, /api/store/merchandise]
       */
 
 
-    // let author = req.params.memberId
-    let name = req.body
-    let author = 18
-    let sql = 'INSERT INTO `order_type` (`name`, `author`) VALUES '
-
-    let valueList = []
-    for (let row in name) {
-      valueList.push('(\'' + name[row] + '\', ' + author + ')')
-    }
-    sql += valueList.join(', ')
-    console.log(sql)
+    let storeId = 1
     try {
 
-      let insertQuery = await pool.execute(sql)
+      for (let i = 1; i <= 7; i++) {
+        let name = faker.name.lastName()
+        let price = faker.commerce.price()
+        let lastUpdatedIp = faker.internet.ip()
+
+        let query = await pool.query(
+          'INSERT INTO `store_merchandise` \
+                    (`store_id`, `name`, `price`, `last_updated_ip`) \
+                    VALUES (?, ?, ?, ?)', [storeId, name, price, lastUpdatedIp]
+        )
+      }
 
       let [response] = await pool.query(
-        'SELECT * FROM `order_type` \
-                WHERE `ordertype_id`= last_insert_id()'
+        'SELECT `name`, `price` FROM `store_merchandise` \
+                WHERE `store_id`= ?', [storeId]
       )
 
-      console.log('거래방식 생성 완료: ', response[0])
-      res.status(201).json(response)[0]
+      console.log('상품 등록 완료: ', response)
+      res.status(201).json(response)
     } catch (e) {
       res.status(503).send(e)
-      throw new Error('거래방식 생성 중 오류 발생')
+      throw new Error('상품 등록 중 오류 발생')
     }
 
-  },
-  MappingOrderTypeToStore: async (req, res, next) => {
-    /**
-                 * URI: [POST, /api/store/:storeId/ordertype]
-                 */
-
-
-    // let author = req.params.memberId
-    let orderType = req.body
-    let storeId = req.params.storeId
-    let sql = 'INSERT INTO `store_to_ordertype` (`store_id`, `ordertype_id`) VALUES '
-
-    let valueList = []
-    for (let row in orderType) {
-      valueList.push('(\'' + storeId + '\', (SELECT `ordertype_id` FROM `order_type` WHERE `name` = \'' + orderType[row] + '\'))')
-    }
-    sql += valueList.join(', ')
-    console.log(sql)
-    try {
-
-      let insertQuery = await pool.execute(sql)
-
-      // let [response] = await pool.query(
-      //     "SELECT * FROM `order_type` \
-      //     WHERE `ordertype_id`= last_insert_id()"
-      // );
-
-      console.log('거래방식 매핑 완료: ', response[0])
-      res.status(201).json(response)[0]
-    } catch (e) {
-      res.status(503).send(e)
-      throw new Error('거래방식 매핑 중 오류 발생')
-    }
   },
 }
