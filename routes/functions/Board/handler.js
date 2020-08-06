@@ -11,8 +11,9 @@ module.exports = {
      */
     let data = await BoardHelper.getReadBoardContentDto(req)
     let readBoardContent = BoardHelper.readBoardContent(data)
-    readBoardContent.then(result => res.status(201).json(result))
-      .cath(err => res.status(503).send(err))
+    readBoardContent
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
   },
   ReadAllBoardContents: async (req, res, next) => {
     /**
@@ -21,11 +22,13 @@ module.exports = {
     let data = await BoardHelper.getReadAllBoardContentsDto(req)
     if (data.category === '10000') { // 자유게시판
       let freeBoardContents = BoardHelper.readAllFreeBoardContents(data)
-      freeBoardContents.then(result => res.status(201).json(result))
+      freeBoardContents
+        .then(result => res.status(201).json(result))
         .catch(err => res.status(503).send(err))
     } else if (data.category === '10001') { // 공지사항
       let noticeBoardContents = BoardHelper.readAllNoticeBoardContents(data)
-      noticeBoardContents.then(result => res.status(201).json(result))
+      noticeBoardContents
+        .then(result => res.status(201).json(result))
         .catch(err => res.status(503).send(err))
     }
   },
@@ -41,7 +44,8 @@ module.exports = {
     let data = await BoardHelper.getPostNewBoardContentDto(req)
     console.log(data)
     let postBoardContent = BoardHelper.postNewBoardContent(data)
-    postBoardContent.then(result => res.status(201).json(result))
+    postBoardContent
+      .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   EditBoardContent: async (req, res, next) => {
@@ -54,7 +58,8 @@ module.exports = {
      */
     let data = await BoardHelper.getEditBoardContentDto(req)
     let editBoardContent = BoardHelper.editBoardContent(data)
-    editBoardContent.then(result => res.status(201).json(result))
+    editBoardContent
+      .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   RemoveBoardContent: async (req, res, next) => {
@@ -63,7 +68,8 @@ module.exports = {
      */
     let data = await BoardHelper.getRemoveBoardContentDto(req)
     let removeBoardContent = BoardHelper.removeBoardContent(data)
-    removeBoardContent.then(result => res.status(201).json(result))
+    removeBoardContent
+      .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   VoteBoardContent: async (req, res, next) => {

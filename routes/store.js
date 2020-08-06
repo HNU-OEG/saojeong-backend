@@ -28,7 +28,7 @@ router.post('/:storeId/ordertype', StoreHandler.RegisterOrderTypeOnStore)
 
 
 
-
+// 로직 정의 필요
 router.post('/merchandise', StoreHelper.CreateStoreMerchandise)
 
 

@@ -400,7 +400,7 @@ module.exports = {
   },
 
 
-  // 상품 품목 관련 로직이 정의 되어야합니다
+  // 판매 품목 관련 로직이 정의 되어야합니다
   CreateStoreMerchandise: async (req, res, next) => {
     /**
       * URI: [POST, /api/store/merchandise]
