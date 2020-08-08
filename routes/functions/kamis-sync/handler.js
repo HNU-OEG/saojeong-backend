@@ -1,5 +1,6 @@
 const dynamoose = require('dynamoose')
 const Event = require('../../../database/models/event-products-create')
+const Product = require('../../../database/models/wholesale-products')
 const fetch = require('node-fetch')
 const { generateURLbyQueryString, getToday } = require('../utils')
 const { Location, Category } = require('../../../config/product-attributes')
@@ -44,4 +45,15 @@ module.exports.kamisSync = async (req, res, next) => {
   } else {
     throw new Error('Fetching KAMIS Price trends failed ')
   }
+}
+
+module.exports.eventSync = async (req, res, next) => {
+  let eventsync = await Event.getParse()
+  let date = eventsync.regDate
+  let kamis_data = eventsync.kamisProductJSON
+  kamis_data.map(element => {
+    var _elem = { ...element, date }
+    let save = Product.format(_elem)
+    console.log(save)
+  })
 }
