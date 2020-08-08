@@ -16,5 +16,13 @@ module.exports = {
       console.log(data)
       return data
     })
+  },
+  getParse: async () => {
+    return Event.scan('id').exec().then(data => {
+      return data[0]
+    })
+      .catch(err => {
+        throw err
+      })
   }
 }
