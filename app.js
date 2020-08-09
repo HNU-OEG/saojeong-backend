@@ -11,6 +11,7 @@ const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const storeRouter = require('./routes/store')
 const boardRouter = require('./routes/board')
+const authRouter = require('./routes/auth')
 
 var passport = require('./config/passport')
 
@@ -40,6 +41,7 @@ app.use(passport.initialize())
 
 app.use('/', indexRouter)
 app.use('/admin/api', usersRouter)
+app.use('/auth', authRouter)
 app.use('/api/store', passport.authenticate('jwt', { session: false }), storeRouter)
 app.use('/api/board', passport.authenticate('jwt', { session: false }), boardRouter)
 
