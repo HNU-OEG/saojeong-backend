@@ -2,27 +2,11 @@ const passport = require('passport')
 const passportJWT = require('passport-jwt')
 const JWTStrategy = passportJWT.Strategy
 const ExtractJWT = passportJWT.ExtractJwt
-const LocalStrategy = require('passport-local').Strategy
+const FacebookStrategy = require('passport-facebook').Strategy
+const randToken = require('rand-token')
+
 let pool = require('./db')
 require('dotenv').config()
-
-// Local Strategy
-// passport.use(new LocalStrategy({
-//     usernameField: 'email',
-//     passwordField: 'password'
-// },
-//     function (email, password, done) {
-//         // 이 부분에선 저장되어 있는 User를 비교하면 된다. 
-//         return UserModel.findOne({ where: { email: email, password: password } })
-//             .then(user => {
-//                 if (!user) {
-//                     return done(null, false, { message: 'Incorrect email or password.' });
-//                 }
-//                 return done(null, user, { message: 'Logged In Successfully' });
-//             })
-//             .catch(err => done(err));
-//     }
-// ));
 
 //JWT Strategy
 passport.use(new JWTStrategy({
@@ -52,12 +36,45 @@ passport.use(new JWTStrategy({
 ))
 
 
-// passport.serializeUser(function (user, done) {
-//     done(null, user);
-// });
-// passport.deserializeUser(function (user, done) {
-//     done(null, user);
-// });
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_APP_SECRET,
+  callbackURL: 'http://localhost:3000/auth/facebook/callback'
+}, async function (accessToken, refreshToken, profile, cb) {
+  let userdata = {
+    member_id: randToken.suid(20),
+    username: profile.id,
+    nickname: profile.displayName,
+    type: 1,
+    provider: 'Facebook',
+    provider_version: '7.0'
+  }
+  console.log(accessToken, refreshToken)
+  try {
+    let [result] = await pool.query('select username from users where username = ?', profile.id)
+    if (result.length == 0) {
+      let save_userdata = await pool.execute('insert into users (member_id, username, nickname, type) values (?,?,?,?)', [userdata.member_id, userdata.username, userdata.nickname, userdata.type])
+      let save_oauth_info = await pool.execute('insert into oauth_id (member_id, provider, oauth_version, access_token, refresh_token) values (?,?,?,?,?)', [userdata.member_id, userdata.provider, userdata.provider_version, accessToken, refreshToken])
+      return cb(null, userdata)
+    } else {
+      return cb(null, userdata)
+    }
+  } catch (err) {
+    return cb(err, null)
+  }
+  // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+  //   return cb(err, user)
+  // })
+}
+))
+
+
+passport.serializeUser(function (user, done) {
+  done(null, user)
+})
+passport.deserializeUser(function (user, done) {
+  done(null, user)
+})
 
 
 module.exports = passport
