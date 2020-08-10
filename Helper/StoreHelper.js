@@ -5,7 +5,7 @@ module.exports = {
   readAllOrderByGrade: async (data) => {
     let member_id  = data.member_id
     try {
-      let storeList = pool.query(
+      let storeList = await pool.query(
         'SELECT \
           `store_indexholder` AS `store_number`, \
           `store_name`, `vote_grade_average`, \
@@ -18,7 +18,7 @@ module.exports = {
         WHERE `is_visible` = 1 \
         ORDER BY `vote_grade_average` DESC', [member_id])
 
-      console.log('평점순 점포 리스트 조회 완료: ', storeList)
+      console.log('평점순 점포 리스트 조회 완료: ', storeList[0])
       return storeList
     } catch (e) {
       console.log('평점 순 점포 리스트 조회 중 오류 발생' , e)
@@ -48,6 +48,8 @@ module.exports = {
       sql += ' DESC'
     } else if (orderby === 'store_name') {
       sql += ' ASC'
+    } else if (orderby === 'vote_grade_count') {
+      sql += ' DESC'
     }
 
     data.sql = sql

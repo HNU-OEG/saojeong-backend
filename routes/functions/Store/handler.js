@@ -20,6 +20,7 @@ module.exports = {
     /**
      * URI: [GET, /api/store]
      */
+    console.log(req)
     let data = await StoreHelper.getAllReadOrderByGradeDto(req)
     let readAllStore = StoreHelper.readAllOrderByGrade(data)
     readAllStore
