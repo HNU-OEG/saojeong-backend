@@ -44,6 +44,7 @@ module.exports = {
      */
     let data = await StoreHelper.getReadOrderByTypeDto(req)
     data = await StoreHelper.getSqlForReadOrderByType(data)
+    console.log(data)
     let readAllStore = StoreHelper.readOrderByType(data)
     readAllStore
       .then(result => res.status(201).json(result[0]))
