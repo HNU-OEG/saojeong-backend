@@ -133,8 +133,8 @@ module.exports = {
     ON `si`.`store_id` = `so`.`store_id` \
     WHERE `si`.`store_type` = ?\
     AND so.weekday = WEEKDAY(CURDATE()) \
-    AND so.start_hour <= CURRENT_TIME() \
-    AND so.end_hour >= CURRENT_TIME() \
+    AND (so.start_hour <= CURRENT_TIME() \
+    AND so.end_hour >= CURRENT_TIME()) \
     ORDER BY ? '
 
     let getClosedStore = 
@@ -149,8 +149,8 @@ module.exports = {
     ON `si`.`store_id` = `so`.`store_id` \
     WHERE `si`.`store_type` = ? \
     AND so.weekday = WEEKDAY(CURDATE()) \
-    AND so.start_hour > CURRENT_TIME() \
-    AND so.end_hour < CURRENT_TIME() \
+    AND (so.start_hour > CURRENT_TIME() \
+    OR so.end_hour < CURRENT_TIME()) \
     ORDER BY ? '
 
     if (orderby === 'vote_grade_average') {
