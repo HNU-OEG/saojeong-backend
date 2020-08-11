@@ -56,18 +56,10 @@ module.exports = {
     
     let data = await BoardHelper.getPostNewBoardContentDto(req)
 
-    if (data.category === board_category['자유게시판']
-      || data.category === board_category['문의게시판']) {
-      let postBoardContent = BoardHelper.postNewBoardContent(data)
-      postBoardContent
-        .then(result => res.status(201).json(result))
-        .catch(err => res.status(503).send(err))
-    } else if (data.category === board_category['공지사항'] 
-            || data.category === board_category['사오정 소식'] 
-            || data.category === board_category['자주하는문의']) {
-      // let postNewQna = BoardHelper.postNewQna(data)
-       
-    }
+    let postBoardContent = BoardHelper.postNewBoardContent(data)
+    postBoardContent
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
   },
   EditBoardContent: async (req, res, next) => {
     /**

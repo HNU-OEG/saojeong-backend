@@ -2,6 +2,61 @@ const faker = require('faker/locale/ko')
 const pool = require('../config/db')
 
 module.exports = {
+  readStoreDetail: async (data) => {
+    let member_id = data.member_id
+    let store_id = data.store_id
+    try {
+      let [merchandise] = await pool.query(
+        'SELECT * FROM `store_merchandise` WHERE store_id = ?', [store_id]
+      )
+
+      let [detail] = await pool.query(
+        'SELECT si.store_image, si.store_indexholder, si.store_name, \
+          si.store_intro, si.vote_grade_count, si.vote_grade_average, \
+          GROUP_CONCAT(DISTINCT st.telephone) AS telephone, \
+          IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS starred \
+        FROM `store_information` AS si \
+        LEFT JOIN `starred_store` AS ss \
+        ON si.store_id = ss.store_id AND ss.is_visible = 1  \
+        LEFT JOIN `store_telephone` AS st \
+        ON si.store_id = st.store_id AND st.is_visible = 1  \
+        WHERE si.store_id = ?', [store_id]
+      )
+
+      let [opening] = await pool.query(
+        'SELECT weekday, start_hour, end_hour \
+        FROM `store_opening_hours` \
+        WHERE store_id = ?', [store_id]
+      )
+
+      let [grade] = await pool.query(
+        'SELECT si.question1_average AS kindness_average, \
+        si.question2_average AS merchandise_average, si.question3_average AS price_average, \
+        vg.question1 AS my_kindness, vg.question2 AS my_merchandise, vg.question3 AS my_price \
+        FROM store_information AS si, store_vote_grade AS vg \
+        WHERE si.store_id  = ? AND vg.member_id = ? AND si.store_id = vg.store_id  AND vg.is_available = 1',
+        [store_id, member_id]
+      )
+
+      detail[0].opening = opening
+      let response = {
+        'store_merchandise': merchandise,
+        'store_detail': detail[0],
+        'store_grade': grade[0],
+      }
+      console.log('상점 조회 완료: ', response)
+      return response
+    } catch (e) {
+      console.log('상점 조회 중 오류 발생' , e)
+      throw new Error('상점 조회 중 오류 발생')
+    }
+  },
+  getStoreDetailDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_id': req.params.storeId,
+    }
+  },
   readAllOrderByGrade: async (data) => {
     let member_id  = data.member_id
     try {
