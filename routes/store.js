@@ -5,6 +5,8 @@ const StoreHandler = require('./functions/Store/handler.js')
 
 // 점포 조회 관련
 router.get('/', StoreHandler.ReadAllStoresOrderByGrade)
+router.get('/starred', StoreHandler.ReadAllStarredStore)
+router.get('/voted', StoreHandler.ReadAllVotedStore)
 router.get('/:storeId', StoreHandler.ReadStoreDetail)
 router.get('/type/:type/orderby/:orderby', StoreHandler.ReadStoresOrderByType)
 

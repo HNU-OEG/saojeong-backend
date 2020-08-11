@@ -4,6 +4,52 @@ const { getWeekday } = require('../routes/functions/utils')
 const weekday = { 'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4, 'sat': 5, 'sun': 6 }
 
 module.exports = {
+  readAllVotedStore: async (data) => {
+    let member_id = data.member_id
+    try {
+      let [storeList] = await pool.query(
+        'SELECT si.store_indexholder AS store_number, \
+        si.store_name, si.vote_grade_average \
+        FROM `store_information` AS si, `store_vote_grade` AS vg \
+        WHERE si.store_id = vg.store_id AND vg.member_id = ? \
+        AND vg.is_available = 1 AND si.is_visible = 1', [member_id])
+
+      console.log('평가한 점포 리스트 조회 완료: ', storeList)
+      return storeList
+    } catch (e) {
+      console.log('평가한 점포 리스트 조회 중 오류 발생' , e)
+      throw new Error('좋아하는 점포 리스트 조회 중 오류 발생')
+    }
+  },
+  getReadAllVotedStoreDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+    }
+  },
+  readStarredAllStore: async (data) => {
+    let member_id = data.member_id
+    try {
+      let [storeList] = await pool.query(
+        'SELECT si.store_indexholder AS store_number, \
+        si.store_name, si.vote_grade_average, si.store_image, \
+        si.vote_grade_count \
+        FROM store_information AS si, starred_store AS ss \
+        WHERE ss.store_id = si.store_id AND ss.member_id = ? \
+        AND ss.is_visible = 1 AND si.is_visible = 1', [member_id])
+
+      console.log('좋아하는 점포 리스트 조회 완료: ', storeList)
+      return storeList
+    } catch (e) {
+      console.log('좋아하는 점포 리스트 조회 중 오류 발생' , e)
+      throw new Error('좋아하는 점포 리스트 조회 중 오류 발생')
+    }
+  },
+  getReadStarredAllStoreDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_id': req
+    }
+  },
   readStoreDetail: async (data) => {
     let member_id = data.member_id
     let store_id = data.store_id

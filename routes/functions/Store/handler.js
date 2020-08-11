@@ -26,6 +26,27 @@ module.exports = {
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
+  ReadAllVotedStore: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/store/voted]
+     */
+    let data = await StoreHelper.getReadAllVotedStoreDto(req)
+    let votedStore = StoreHelper.readAllVotedStore(data)
+    votedStore
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+
+  },
+  ReadAllStarredStore: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/store/starred]
+     */
+    let data = await StoreHelper.getReadStarredAllStoreDto(req)
+    let starredStore = StoreHelper.readStarredAllStore(data)
+    starredStore
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
   ReadAllStoresOrderByGrade: async (req, res, next) => {
     /**
      * URI: [GET, /api/store]
