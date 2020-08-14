@@ -6,7 +6,7 @@ const UserHandler = require('./functions/User/handler')
 const passport = require('../config/passport')
 const BoardHelper = require('../Helper/BoardHelper')
 const StoreHelper = require('../Helper/StoreHelper')
-const { kamisSync } = require('./functions/kamis-sync/handler')
+const { kamisSync, eventSync } = require('./functions/kamis-sync/handler')
 
 // router.get('/users', passport.authenticate('jwt', {session: false}), UserController.index);
 // router.post('/auth/tokens', UserHandler.CreateJWTToken);
@@ -37,5 +37,6 @@ router.get('/search', BoardHandler.SearchBoard)
 
 // kamis 데이터 동기화
 router.get('/cron/kamis-daily-sync', kamisSync)
+router.get('/cron/process-event', eventSync)
 
 module.exports = router
