@@ -11,6 +11,7 @@ const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const storeRouter = require('./routes/store')
 const boardRouter = require('./routes/board')
+const s3Router = require('./routes/s3')
 
 var passport = require('./config/passport')
 
@@ -42,6 +43,7 @@ app.use('/', indexRouter)
 app.use('/admin/api', usersRouter)
 app.use('/api/store', passport.authenticate('jwt', { session: false }), storeRouter)
 app.use('/api/board', passport.authenticate('jwt', { session: false }), boardRouter)
+app.use('/api/images', passport.authenticate('jwt', { session: false }), s3Router)
 
 // The error handler must be before any other error middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler())
