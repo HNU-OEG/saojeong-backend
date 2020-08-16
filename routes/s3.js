@@ -7,8 +7,8 @@ const passport = require('../config/passport')
 
 
 
-router.post('/upload', upload.single('image'), S3Hanlder.UploadImage)
-router.post('/uploads', upload.array('images', 3), S3Hanlder.UploadImages)
+// router.post('/upload', upload.single('image'), S3Hanlder.UploadImage)
+// router.post('/uploads', upload.array('images', 3), S3Hanlder.UploadImages)
 
 
 module.exports = router
