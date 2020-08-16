@@ -15,7 +15,17 @@ module.exports = {
     }
 
     let data = await SeasonalHelper.getPostSeasonalFoodDto(req)
-    let seasonalFood = SeasonalHelper.postSeasonalFoood(data)
+    let seasonalFood = SeasonalHelper.postSeasonalFood(data)
+    seasonalFood
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
+  ReadSeasonalFood: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/foods/type/:type/month/:month]
+     */
+
+    let seasonalFood = SeasonalHelper.readSeasonalFood(req)
     seasonalFood
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
