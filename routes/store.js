@@ -2,6 +2,7 @@ var express = require('express')
 var router = express.Router()
 const StoreHelper = require('../Helper/StoreHelper')
 const StoreHandler = require('./functions/Store/handler.js')
+let upload = require('../config/s3')
 
 // 점포 조회 관련
 router.get('/', StoreHandler.ReadAllStoresOrderByGrade)
@@ -11,7 +12,7 @@ router.get('/:storeId', StoreHandler.ReadStoreDetail)
 router.get('/type/:type/orderby/:orderby', StoreHandler.ReadStoresOrderByType)
 
 // 점포 필수 정보 관련
-router.post('/', StoreHandler.CreateStoreInformation)
+router.post('/', upload('store_information').single('image'), StoreHandler.CreateStoreInformation)
 
 // 점포 필수 정보 관련 - 연락처
 router.post('/:storeId/telephone', StoreHandler.CreateStoreTelephone)

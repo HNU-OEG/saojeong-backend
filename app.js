@@ -42,6 +42,7 @@ app.use(passport.initialize())
 app.use('/', indexRouter)
 app.use('/admin/api', usersRouter)
 app.use('/api/store', passport.authenticate('jwt', { session: false }), storeRouter)
+// app.use('/api/store', storeRouter)
 app.use('/api/board', passport.authenticate('jwt', { session: false }), boardRouter)
 app.use('/api/foods', passport.authenticate('jwt', { session: false}), seasonalRouter)
 
