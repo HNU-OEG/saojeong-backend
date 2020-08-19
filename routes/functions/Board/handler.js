@@ -4,6 +4,14 @@ const BoardHelper2 = require('../../../Helper/BoardHelper2')
 const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
 
+const board_category = {
+  '사오정 소식': 10000, 
+  '문의게시판': 10001, 
+  '자주하는문의':10002,
+  '공지사항': 10003, 
+  '자유게시판': 10004
+}
+
 module.exports = {
   ReadBoardContent: async (req, res, next) => {
     /**
@@ -19,30 +27,35 @@ module.exports = {
     /**
      * URI: [GET, /api/board/:category/content]
      */
+
+
     let data = await BoardHelper.getReadAllBoardContentsDto(req)
-    if (data.category === '10000') { // 자유게시판
+    if (data.category === board_category['자유게시판'] 
+      || data.category === board_category['문의게시판']) { // 자유게시판
       let freeBoardContents = BoardHelper.readAllFreeBoardContents(data)
       freeBoardContents
         .then(result => res.status(201).json(result))
         .catch(err => res.status(503).send(err))
-    } else if (data.category === '10001') { // 공지사항
+    } else if (data.category === board_category['공지사항'] 
+            || data.category === board_category['사오정 소식'] 
+            || data.category === board_category['자주하는문의']) { // 공지사항
       let noticeBoardContents = BoardHelper.readAllNoticeBoardContents(data)
       noticeBoardContents
         .then(result => res.status(201).json(result))
         .catch(err => res.status(503).send(err))
-    }
+    } 
   },
   PostNewBoardContent: async (req, res, next) => {
     /**
      * URI: [POST, /api/board/:category/content]
      * Request Body: {
-     *  "document_id": "...",
      *  "title": "...",
      *  "content": "..."
      * }
      */
+    
     let data = await BoardHelper.getPostNewBoardContentDto(req)
-    console.log(data)
+
     let postBoardContent = BoardHelper.postNewBoardContent(data)
     postBoardContent
       .then(result => res.status(201).json(result))
@@ -241,5 +254,5 @@ module.exports = {
     } else {
       return res.status(200).json({ 'result': '조건을 입력하지 않았습니다.' })
     }
-  }
+  },
 }

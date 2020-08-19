@@ -156,6 +156,26 @@ module.exports = {
       throw new Error('게시글 생성 중 오류 발생\n', e)
     }
   },
+  postNewQna: async (data) => {
+    try {
+      let postQna = await pool.execute(
+        'INSERT INTO `board_contents` \
+        (`board_category`, `member_id`, `title`, `content`, `last_updated_ip`) \
+        VALUES (?, ?, ?, ?, ?)',
+        [data.category, data.member_id, data.title, data.content, data.user_ip]
+      )
+
+      let [checkWritingPost] = await pool.query(
+        'SELECT * FROM `board_contents` \
+        WHERE `document_id`= last_insert_id()'
+      )
+
+      console.log('게시글 생성 완료\n', checkWritingPost[0])
+      return checkWritingPost[0]
+    } catch (e) {
+      throw new Error('게시글 생성 중 오류 발생\n', e)
+    }
+  },
   getPostNewBoardContentDto: async (req) => {
     return {
       'member_id': req.user.member_id,

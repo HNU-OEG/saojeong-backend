@@ -1,11 +1,114 @@
 const faker = require('faker/locale/ko')
 const pool = require('../config/db')
+const { getWeekday } = require('../routes/functions/utils')
+const weekday = { 'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4, 'sat': 5, 'sun': 6 }
 
 module.exports = {
+  readAllVotedStore: async (data) => {
+    let member_id = data.member_id
+    try {
+      let [storeList] = await pool.query(
+        'SELECT si.store_indexholder AS store_number, \
+        si.store_name, si.vote_grade_average \
+        FROM `store_information` AS si, `store_vote_grade` AS vg \
+        WHERE si.store_id = vg.store_id AND vg.member_id = ? \
+        AND vg.is_available = 1 AND si.is_visible = 1', [member_id])
+
+      console.log('평가한 점포 리스트 조회 완료: ', storeList)
+      return storeList
+    } catch (e) {
+      console.log('평가한 점포 리스트 조회 중 오류 발생' , e)
+      throw new Error('좋아하는 점포 리스트 조회 중 오류 발생')
+    }
+  },
+  getReadAllVotedStoreDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+    }
+  },
+  readStarredAllStore: async (data) => {
+    let member_id = data.member_id
+    try {
+      let [storeList] = await pool.query(
+        'SELECT si.store_indexholder AS store_number, \
+        si.store_name, si.vote_grade_average, si.store_image, \
+        si.vote_grade_count \
+        FROM store_information AS si, starred_store AS ss \
+        WHERE ss.store_id = si.store_id AND ss.member_id = ? \
+        AND ss.is_visible = 1 AND si.is_visible = 1', [member_id])
+
+      console.log('좋아하는 점포 리스트 조회 완료: ', storeList)
+      return storeList
+    } catch (e) {
+      console.log('좋아하는 점포 리스트 조회 중 오류 발생' , e)
+      throw new Error('좋아하는 점포 리스트 조회 중 오류 발생')
+    }
+  },
+  getReadStarredAllStoreDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_id': req
+    }
+  },
+  readStoreDetail: async (data) => {
+    let member_id = data.member_id
+    let store_id = data.store_id
+    try {
+      let [merchandise] = await pool.query(
+        'SELECT * FROM `store_merchandise` WHERE store_id = ?', [store_id]
+      )
+
+      let [detail] = await pool.query(
+        'SELECT si.store_image, si.store_indexholder, si.store_name, \
+          si.store_intro, si.vote_grade_count, si.vote_grade_average, \
+          GROUP_CONCAT(DISTINCT st.telephone) AS telephone, \
+          IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS starred \
+        FROM `store_information` AS si \
+        LEFT JOIN `starred_store` AS ss \
+        ON si.store_id = ss.store_id AND ss.is_visible = 1  \
+        LEFT JOIN `store_telephone` AS st \
+        ON si.store_id = st.store_id AND st.is_visible = 1  \
+        WHERE si.store_id = ?', [store_id]
+      )
+
+      let [opening] = await pool.query(
+        'SELECT weekday, start_hour, end_hour \
+        FROM `store_opening_hours` \
+        WHERE store_id = ?', [store_id]
+      )
+
+      let [grade] = await pool.query(
+        'SELECT si.question1_average AS kindness_average, \
+        si.question2_average AS merchandise_average, si.question3_average AS price_average, \
+        vg.question1 AS my_kindness, vg.question2 AS my_merchandise, vg.question3 AS my_price \
+        FROM store_information AS si, store_vote_grade AS vg \
+        WHERE si.store_id  = ? AND vg.member_id = ? AND si.store_id = vg.store_id  AND vg.is_available = 1',
+        [store_id, member_id]
+      )
+
+      detail[0].opening = opening
+      let response = {
+        'store_merchandise': merchandise,
+        'store_detail': detail[0],
+        'store_grade': grade[0],
+      }
+      console.log('상점 조회 완료: ', response)
+      return response
+    } catch (e) {
+      console.log('상점 조회 중 오류 발생' , e)
+      throw new Error('상점 조회 중 오류 발생')
+    }
+  },
+  getStoreDetailDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'store_id': req.params.storeId,
+    }
+  },
   readAllOrderByGrade: async (data) => {
     let member_id  = data.member_id
     try {
-      let storeList = pool.query(
+      let storeList = await pool.query(
         'SELECT \
           `store_indexholder` AS `store_number`, \
           `store_name`, `vote_grade_average`, \
@@ -18,7 +121,7 @@ module.exports = {
         WHERE `is_visible` = 1 \
         ORDER BY `vote_grade_average` DESC', [member_id])
 
-      console.log('평점순 점포 리스트 조회 완료: ', storeList)
+      console.log('평점순 점포 리스트 조회 완료: ', storeList[0])
       return storeList
     } catch (e) {
       console.log('평점 순 점포 리스트 조회 중 오류 발생' , e)
@@ -30,40 +133,23 @@ module.exports = {
       'member_id': req.user.member_id,
     }
   },
-  getSqlForReadOrderByType: async (data) => {
-    let orderby = data.orderby
-    let sql = 
-    'SELECT \
-      `store_indexholder` AS `store_number`, \
-      `store_name`, `vote_grade_average`, \
-      `vote_grade_count`, `store_id`, `store_intro`, \
-      IF((SELECT `created_at` FROM `starred_store` AS ss \
-      WHERE `member_id` = ? AND `ss`.`store_id` = `si`.`store_id` AND `is_visible` = 1 LIMIT 1) \
-      IS NOT NULL, TRUE, FALSE) AS `starred` \
-    FROM `store_information` AS `si` \
-    WHERE `is_visible` = 1 AND `store_type` = ? \
-    ORDER BY ?'
-
-    if (orderby === 'vote_grade_average') {
-      sql += ' DESC'
-    } else if (orderby === 'store_name') {
-      sql += ' ASC'
-    }
-
-    data.sql = sql
-    return data
-  },
   readOrderByType: async (data) => {
     let member_id = data.member_id
-    let orderby = data.orderby
     let type = data.type
-    let sql = data.sql
+    let orderby = data.orderby
+    let getOpenStore = data.open_store
+    let getClosedStore = data.closed_store
 
     try {
-      let storeList = pool.query(sql, [member_id, type, orderby])
-
-      console.log('평점순 점포 리스트 조회 완료: ', storeList)
-      return storeList
+      let [openStore] = await pool.query(getOpenStore, [member_id, type, orderby])
+      let [closedStore] = await pool.query(getClosedStore, [member_id, type, orderby])
+  
+      let response = {
+        'open_store': openStore,
+        'closed_store': closedStore,
+      }
+      console.log('평점순 점포 리스트 조회 완료: ', response)
+      return response
     } catch (e) {
       console.log('평점 순 점포 리스트 조회 중 오류 발생' , e)
       throw new Error('평점 순 점포 리스트 조회 중 오류 발생')
@@ -71,12 +157,62 @@ module.exports = {
   },
   getReadOrderByTypeDto: async (req) => {
     let type = {'fruits': '과일', 'vegetables': '채소', 'seafoods': '수산',}
-    let orderby = {'grade': 'vote_grade_average', 'name': 'store_name',}
+    let orderby = {'grade': 'vote_grade_average', 'name': 'store_name', 'count': 'vote_grade_count',}
+    // let today = new Date().getDay() + 1
     return {
       'member_id': req.user.member_id,
       'type': type[req.params.type],
-      'orderby': orderby[req.params.orderby]
+      'orderby': orderby[req.params.orderby],
     }
+  },
+  getSqlForReadOrderByType: async (data) => {
+    let orderby = data.orderby
+    let getOpenStore = 
+    'SELECT si.`store_indexholder` AS `store_number`, \
+      si.`store_name`, si.`vote_grade_average`, \
+      si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
+      IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
+    FROM `store_information` AS `si` \
+    LEFT JOIN `starred_store` AS `ss` \
+    ON `ss`.`member_id` = ? AND `si`.`store_id` = `ss`.`store_id` AND `ss`.`is_visible` = 1 \
+    LEFT JOIN `store_opening_hours` AS `so` \
+    ON `si`.`store_id` = `so`.`store_id` \
+    WHERE `si`.`store_type` = ?\
+    AND so.weekday = WEEKDAY(CURDATE()) \
+    AND (so.start_hour <= CURRENT_TIME() \
+    AND so.end_hour >= CURRENT_TIME()) \
+    ORDER BY ? '
+
+    let getClosedStore = 
+    'SELECT si.`store_indexholder` AS `store_number`, \
+      si.`store_name`, si.`vote_grade_average`, \
+      si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
+      IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
+    FROM `store_information` AS `si` \
+    LEFT JOIN `starred_store` AS `ss` \
+    ON `ss`.`member_id` = ? AND `si`.`store_id` = `ss`.`store_id` AND `ss`.`is_visible` = 1 \
+    LEFT JOIN `store_opening_hours` AS `so` \
+    ON `si`.`store_id` = `so`.`store_id` \
+    WHERE `si`.`store_type` = ? \
+    AND so.weekday = WEEKDAY(CURDATE()) \
+    AND (so.start_hour > CURRENT_TIME() \
+    OR so.end_hour < CURRENT_TIME()) \
+    ORDER BY ? '
+
+    if (orderby === 'vote_grade_average') {
+      getOpenStore += ' DESC'
+      getClosedStore += ' DESC'
+    } else if (orderby === 'store_name') {
+      getOpenStore += ' ASC'
+      getClosedStore += ' ASC'
+    } else if (orderby === 'vote_grade_count') {
+      getOpenStore += ' DESC'
+      getClosedStore += ' DESC'
+    }
+
+    data.open_store = getOpenStore
+    data.closed_store = getClosedStore
+    return data
   },
   createStoreInformation: async (data) => {
     let member_id = data.member_id
@@ -178,7 +314,8 @@ module.exports = {
       let create = await pool.execute(sql)
       
       let [response] = await pool.query(
-        'SELECT `weekday`, TIME_FORMAT(`start_hour`, "%H:%i") AS `open`, TIME_FORMAT(`end_hour`, "%H:%i") AS `close` FROM `store_opening_hours` \
+        'SELECT `weekday`, TIME_FORMAT(`start_hour`, "%H:%i") AS `open`, \
+        TIME_FORMAT(`end_hour`, "%H:%i") AS `close` FROM `store_opening_hours` \
         WHERE `store_id`= ? ORDER BY `weekday` ASC', 
         [store_id]
       )
@@ -200,7 +337,6 @@ module.exports = {
     let body = data.body
     let store_id = data.store_id
 
-    let weekday = { 'sun': 1, 'mon': 2, 'tue': 3, 'wed': 4, 'thu': 5, 'fri': 6, 'sat': 7 }
     let sql = 'INSERT INTO `store_opening_hours` \
               (`store_id`, `weekday`, `start_hour`, `end_hour`) VALUES '
 
@@ -398,7 +534,6 @@ module.exports = {
     data.sql = sql
     return data
   },
-
 
   // 판매 품목 관련 로직이 정의 되어야합니다
   CreateStoreMerchandise: async (req, res, next) => {
