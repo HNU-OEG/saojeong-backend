@@ -7,9 +7,12 @@ module.exports = new Schema({
     rangeKey: true
   },
   categoryCode: {
-    type: String,
-    required: true
+    type: Number
   },
+  // categoryCode: {
+  //   type: Number,
+  //   required: true
+  // },
   itemCode: {
     type: Number,
     required: true,
@@ -31,6 +34,8 @@ module.exports = new Schema({
   },
   price: {
     type: Number,
-    required: true
+    default: null
   }
+}, {
+  timestamps: true
 })
