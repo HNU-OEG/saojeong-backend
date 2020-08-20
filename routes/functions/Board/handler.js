@@ -6,11 +6,11 @@ const S3Helper = require('../../../Helper/S3Helper')
 const pool = require('../../../config/db')
 
 const board_category = {
-  '사오정 소식': 10000, 
-  '문의게시판': 10001, 
-  '자주하는문의':10002,
-  '공지사항': 10003, 
-  '자유게시판': 10004
+  '사오정 소식': '10000', 
+  '문의게시판': '10001', 
+  '자주하는문의':'10002',
+  '공지사항': '10003', 
+  '자유게시판': '10004'
 }
 
 module.exports = {
@@ -28,8 +28,6 @@ module.exports = {
     /**
      * URI: [GET, /api/board/:category/content]
      */
-
-
     let data = await BoardHelper.getReadAllBoardContentsDto(req)
     if (data.category === board_category['자유게시판'] 
       || data.category === board_category['문의게시판']) { // 자유게시판
