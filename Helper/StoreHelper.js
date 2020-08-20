@@ -31,7 +31,7 @@ module.exports = {
       let [storeList] = await pool.query(
         'SELECT si.store_indexholder AS store_number, \
         si.store_name, si.vote_grade_average, si.store_image, \
-        si.vote_grade_count \
+        si.vote_grade_count, 1 AS `is_starred` \
         FROM store_information AS si, starred_store AS ss \
         WHERE ss.store_id = si.store_id AND ss.member_id = ? \
         AND ss.is_visible = 1 AND si.is_visible = 1', [member_id])
