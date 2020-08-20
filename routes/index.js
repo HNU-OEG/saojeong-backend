@@ -20,8 +20,8 @@ router.put('/admin/api/edit/customers/:member_id.json', passport.authenticate('j
 // 사용자 인증 처리
 router.put('/auth/login', UserHandler.ClaimNewToken)
 
-router.get('/hello', passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  console.log(req.passport.member_id)
+router.get('/hello', passport.authenticate(['jwt', 'facebook'], { session: false }), (req, res, next) => {
+  console.log(req.user)
   res.send('HELLO!!')
 })
 

@@ -4,6 +4,7 @@ const path = require('path')
 const jwt = require('jsonwebtoken')
 const randToken = require('rand-token')
 const momemt = require('moment')
+const { access } = require('fs')
 
 module.exports = {
   checkUserAvailablebyMemberID: async (member_id) => {
@@ -166,6 +167,24 @@ module.exports = {
       }
     } catch (err) {
       throw new Error('Latest Ref ID 를 조회하지 못했습니다.')
+    }
+  },
+  saveNewUserByOAuth: async (member_id, username, email, nickname, type) => {
+    try {
+      let save_userdata = await pool.execute('insert into users (member_id, username, email, nickname, type) values (?,?,?,?,?)', [member_id, username, email, nickname, type])
+      return save_userdata
+    } catch (err) {
+      console.error('Error :>> ', err)
+      throw new Error('OAuth 인증을 통한 새로운 유저 작성 중 오류가 발생했습니다.')
+    }
+  },
+  saveNewOAuthInfo: async (member_id, provider, oauth_version, access_token, refresh_token) => {
+    try {
+      let save_oauth_info = await pool.execute('insert into oauth_id (member_id, provider, oauth_version, access_token, refresh_token) values (?,?,?,?,?)', [member_id, provider, oauth_version, access_token, refresh_token])
+      return save_oauth_info
+    } catch (err) {
+      console.error('Error :>> ', err)
+      throw new Error('OAuth 인증을 통한 인증정보 저장에 실패했습니다.')
     }
   }
 }
