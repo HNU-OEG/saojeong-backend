@@ -25,13 +25,9 @@
     "lodash": "^4.17.19",
     "mariadb": "^2.4.2",
     "moment": "^2.27.0",
-<<<<<<< HEAD
     "morgan": "~1.9.1",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
-=======
-    "morgan": "~1.10.0",
->>>>>>> 515924f6addfd51c06b8e3d1c645dbc3c61349c8
     "node-cron": "^2.0.3",
     "node-fetch": "^2.6.0",
     "passport": "^0.4.1",
