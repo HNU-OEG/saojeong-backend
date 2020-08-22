@@ -34,9 +34,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 
 app.use(passport.initialize())
-// passportConfig();
-
-// app.use(passport.session());
 
 
 app.use('/', indexRouter)
