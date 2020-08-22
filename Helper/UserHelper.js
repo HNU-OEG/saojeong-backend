@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const randToken = require('rand-token')
 const momemt = require('moment')
 const { access } = require('fs')
+const fetch = require('node-fetch')
 
 module.exports = {
   checkUserAvailablebyMemberID: async (member_id) => {
@@ -92,7 +93,7 @@ module.exports = {
       if (old_token[0].refresh_token == oldToken) {
         // 일치하면 이전의 refresh token을 블럭하고 새로운 refresh token 발급 및 리턴
         let claimJWTToken = await pool.execute('insert into oauth_id (member_id, provider, oauth_version, refresh_token, expired_at) values (?,?,?,?,?)', [user_member_id, provider, oauth_version, refresh_token, expiry_date])
-        let revokeOldToken = await pool.execute('update oauth_id set is_activated = 0 where id = ?', [old_token[0].id])
+        let revokeOldToken = await pool.execute('update oauth_id set is_activated = 0 where id = ? and provider="JWT"', [old_token[0].id])
         return refresh_token
       } else {
         return 0
@@ -101,6 +102,84 @@ module.exports = {
       console.log(err)
       throw new Error('JWT Refresh 토큰 발급 중 오류 발생.')
     }
+  },
+  claimJWTRefreshTokenForcefully: async (member_id) => {
+    let user_member_id = member_id
+    let provider = 'JWT'
+    let oauth_version = '1.0'
+    let expiry_date = momemt().add(+180, 'days').format('YYYY-MM-DD HH:mm:ss')
+
+    try {
+      let refresh_token = randToken.generate(256)
+      let revokeOldToken = await pool.execute('update oauth_id set is_activated = 0 where member_id = ? and provider="JWT"', [member_id])
+      let claimJWTToken = await pool.execute('insert into oauth_id (member_id, provider, oauth_version, refresh_token, expired_at) values (?,?,?,?,?)', [user_member_id, provider, oauth_version, refresh_token, expiry_date])
+      return refresh_token
+    } catch (err) {
+      console.log(err)
+      throw new Error('JWT Refresh 토큰 발급 중 오류 발생.')
+    }
+  },
+  claimNewSocialLoginJWTToken: async (username, nickname, email, gender, ipaddr, provider, provider_version, accessToken, refreshToken, type = 1) => {
+    let data = {
+      id: randToken.suid(20), //
+      username: username, // 사용자 고유 식별 id //
+      nickname: nickname, // 
+      email: email || null, //
+      type: type, //
+      gender: gender || null, //
+      enabled: 1,
+      ipaddr: ipaddr,
+      provider: provider,
+      provider_version: provider_version,
+      accessToken: accessToken || null,
+      refreshToken: refreshToken || null
+    }
+
+    if (provider == 'Facebook') {
+      data.refreshToken = await module.exports.claimFacebookRefreshToken(accessToken)
+    }
+
+    let user = await module.exports.saveNewUserByOAuth(data.id, data.username, data.email, data.nickname, data.type, gender)
+    let oauth = await module.exports.saveNewOAuthInfo(data.id, data.provider, data.provider_version, data.accessToken, data.refreshToken)
+
+    try {
+
+      const [result] = await pool.query('select id, member_id, username, nickname, gender, created_at, type from users where id=?', [user[0].insertId])
+
+
+      console.log(result)
+
+
+      let jwtpayload_data = {
+        reference_id: result[0].id || null,
+        member_id: result[0].member_id,
+        nickname: result[0].nickname,
+        usertype: result[0].type
+      }
+      const refreshToken = await module.exports.claimJWTRefreshToken_firstuser(jwtpayload_data.member_id)
+      const token = await module.exports.claimJWTAccessToken(jwtpayload_data)
+      console.log(token)
+      return { result, 'AccessToken': token, 'RefreshToken': refreshToken }
+    } catch (err) {
+      console.log(err)
+      throw new Error('소셜로그인 JWT 사용자 생성 중 오류 발생', err)
+    }
+  },
+  claimFacebookRefreshToken: async (facebook_access_token) => {
+    var url = new URL('https://graph.facebook.com/v7.0/oauth/access_token')
+
+    var params = {
+      grant_type: 'fb_exchange_token',
+      client_id: process.env.FACEBOOK_APP_ID,
+      client_secret: process.env.FACEBOOK_APP_SECRET,
+      fb_exchange_token: facebook_access_token
+    }
+    url.search = new URLSearchParams(params).toString()
+
+    let response = await fetch(url)
+    let result = await response.json()
+    console.log('result :>> ', result)
+    return result.access_token
   },
   checkUserStatus: async (member_id) => {
     try {
@@ -169,9 +248,18 @@ module.exports = {
       throw new Error('Latest Ref ID 를 조회하지 못했습니다.')
     }
   },
-  saveNewUserByOAuth: async (member_id, username, email, nickname, type) => {
+  saveNewUserByOAuth: async (member_id, username, email, nickname, type, gender = null) => {
     try {
-      let save_userdata = await pool.execute('insert into users (member_id, username, email, nickname, type) values (?,?,?,?,?)', [member_id, username, email, nickname, type])
+      let save_userdata = await pool.execute('insert into users (member_id, username, email, nickname, type, gender) values (?,?,?,?,?,?)', [member_id, username, email, nickname, type, gender])
+      return save_userdata
+    } catch (err) {
+      console.error('Error :>> ', err)
+      throw new Error('OAuth 인증을 통한 새로운 유저 작성 중 오류가 발생했습니다.')
+    }
+  },
+  saveNewUserByOAuthKakao: async (member_id, username, email, nickname, type, gender) => {
+    try {
+      let save_userdata = await pool.execute('insert into users (member_id, username, email, nickname, type, gender) values (?,?,?,?,?,?)', [member_id, username, email, nickname, type, gender])
       return save_userdata
     } catch (err) {
       console.error('Error :>> ', err)
