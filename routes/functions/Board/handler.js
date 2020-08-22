@@ -2,14 +2,15 @@
 const BoardHelper = require('../../../Helper/BoardHelper')
 const BoardHelper2 = require('../../../Helper/BoardHelper2')
 const UserHelper = require('../../../Helper/UserHelper')
+const S3Helper = require('../../../Helper/S3Helper')
 const pool = require('../../../config/db')
 
 const board_category = {
-  '사오정 소식': 10000, 
-  '문의게시판': 10001, 
-  '자주하는문의':10002,
-  '공지사항': 10003, 
-  '자유게시판': 10004
+  '사오정 소식': '10000', 
+  '문의게시판': '10001', 
+  '자주하는문의':'10002',
+  '공지사항': '10003', 
+  '자유게시판': '10004'
 }
 
 module.exports = {
@@ -27,8 +28,6 @@ module.exports = {
     /**
      * URI: [GET, /api/board/:category/content]
      */
-
-
     let data = await BoardHelper.getReadAllBoardContentsDto(req)
     if (data.category === board_category['자유게시판'] 
       || data.category === board_category['문의게시판']) { // 자유게시판
@@ -44,6 +43,24 @@ module.exports = {
         .then(result => res.status(201).json(result))
         .catch(err => res.status(503).send(err))
     } 
+  },
+  PostNewSaojeongNews: async (req, res, next) => {
+    /**
+     * URI: [POST, /api/board/:category/contnet]
+     * Request form/data
+     * title: "사오정 뉴스",
+     * image: 이미지
+     */
+    if (!S3Helper.checkUploaded(req.file.location)) {
+      res.status(503).send('사오정소식 S3 업로드 실패!')   
+    }
+
+    let data = await BoardHelper.getPostNewNewsDto(req)
+    let news = BoardHelper.postNewNews(data)
+    news
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+ 
   },
   PostNewBoardContent: async (req, res, next) => {
     /**

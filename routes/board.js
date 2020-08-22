@@ -3,6 +3,8 @@ var router = express.Router()
 const BoardHelper = require('../Helper/BoardHelper')
 const BoardHandler = require('./functions/Board/handler')
 
+let upload = require('../config/s3')
+
 // 게시판 관련
 router.post('/', BoardHelper.CreateBoard)
 
@@ -10,6 +12,7 @@ router.post('/', BoardHelper.CreateBoard)
 router.get('/:category/content', BoardHandler.ReadAllBoardContents)
 router.get('/:category/content/:documentId', BoardHandler.ReadBoardContent)
 router.post('/:category/content', BoardHandler.PostNewBoardContent)
+router.post('/news', upload('news').single('image'), BoardHandler.PostNewSaojeongNews)
 router.put('/:category/content/:documentId', BoardHandler.EditBoardContent)
 router.delete('/:category/content/:documentId', BoardHandler.RemoveBoardContent)
 router.patch('/:category/content/:documentId', BoardHandler.VoteBoardContent)

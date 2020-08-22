@@ -1,4 +1,5 @@
 const StoreHelper = require('../../../Helper/StoreHelper')
+const S3Helper = require('../../../Helper/S3Helper')
 
 module.exports = {
   CreateStoreInformation: async (req, res, next) => {
@@ -10,7 +11,13 @@ module.exports = {
       *   "store_type": [과일, 채소, 수산],
       * }
       */
+    if (!S3Helper.checkUploaded(req.file.location)) {
+      res.status(503).send('상점 사진 업데이트 중 오류 발생!')
+    }
+
     let data = await StoreHelper.getCreateStoreInformaitionDto(req)
+    // console.log(data)
+    // res.send(data)
     let createStoreInformation = StoreHelper.createStoreInformation(data)
     createStoreInformation
       .then(result => res.status(201).send(result))
