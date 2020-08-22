@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@sentry/node": "^5.19.2",
-    "aws-sdk": "^2.735.0",
+    "aws-sdk": "^2.738.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
