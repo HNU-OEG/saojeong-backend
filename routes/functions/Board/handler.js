@@ -2,7 +2,16 @@
 const BoardHelper = require('../../../Helper/BoardHelper')
 const BoardHelper2 = require('../../../Helper/BoardHelper2')
 const UserHelper = require('../../../Helper/UserHelper')
+const S3Helper = require('../../../Helper/S3Helper')
 const pool = require('../../../config/db')
+
+const board_category = {
+  '사오정 소식': '10000', 
+  '문의게시판': '10001', 
+  '자주하는문의':'10002',
+  '공지사항': '10003', 
+  '자유게시판': '10004'
+}
 
 module.exports = {
   ReadBoardContent: async (req, res, next) => {
@@ -11,37 +20,62 @@ module.exports = {
      */
     let data = await BoardHelper.getReadBoardContentDto(req)
     let readBoardContent = BoardHelper.readBoardContent(data)
-    readBoardContent.then(result => res.status(201).json(result))
-      .cath(err => res.status(503).send(err))
+    readBoardContent
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
   },
   ReadAllBoardContents: async (req, res, next) => {
     /**
      * URI: [GET, /api/board/:category/content]
      */
     let data = await BoardHelper.getReadAllBoardContentsDto(req)
-    if (data.category === '10000') { // 자유게시판
+    if (data.category === board_category['자유게시판'] 
+      || data.category === board_category['문의게시판']) { // 자유게시판
       let freeBoardContents = BoardHelper.readAllFreeBoardContents(data)
-      freeBoardContents.then(result => res.status(201).json(result))
+      freeBoardContents
+        .then(result => res.status(201).json(result))
         .catch(err => res.status(503).send(err))
-    } else if (data.category === '10001') { // 공지사항
+    } else if (data.category === board_category['공지사항'] 
+            || data.category === board_category['사오정 소식'] 
+            || data.category === board_category['자주하는문의']) { // 공지사항
       let noticeBoardContents = BoardHelper.readAllNoticeBoardContents(data)
-      noticeBoardContents.then(result => res.status(201).json(result))
+      noticeBoardContents
+        .then(result => res.status(201).json(result))
         .catch(err => res.status(503).send(err))
+    } 
+  },
+  PostNewSaojeongNews: async (req, res, next) => {
+    /**
+     * URI: [POST, /api/board/:category/contnet]
+     * Request form/data
+     * title: "사오정 뉴스",
+     * image: 이미지
+     */
+    if (!S3Helper.checkUploaded(req.file.location)) {
+      res.status(503).send('사오정소식 S3 업로드 실패!')   
     }
+
+    let data = await BoardHelper.getPostNewNewsDto(req)
+    let news = BoardHelper.postNewNews(data)
+    news
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+ 
   },
   PostNewBoardContent: async (req, res, next) => {
     /**
      * URI: [POST, /api/board/:category/content]
      * Request Body: {
-     *  "document_id": "...",
      *  "title": "...",
      *  "content": "..."
      * }
      */
+    
     let data = await BoardHelper.getPostNewBoardContentDto(req)
-    console.log(data)
+
     let postBoardContent = BoardHelper.postNewBoardContent(data)
-    postBoardContent.then(result => res.status(201).json(result))
+    postBoardContent
+      .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   EditBoardContent: async (req, res, next) => {
@@ -54,7 +88,8 @@ module.exports = {
      */
     let data = await BoardHelper.getEditBoardContentDto(req)
     let editBoardContent = BoardHelper.editBoardContent(data)
-    editBoardContent.then(result => res.status(201).json(result))
+    editBoardContent
+      .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   RemoveBoardContent: async (req, res, next) => {
@@ -63,7 +98,8 @@ module.exports = {
      */
     let data = await BoardHelper.getRemoveBoardContentDto(req)
     let removeBoardContent = BoardHelper.removeBoardContent(data)
-    removeBoardContent.then(result => res.status(201).json(result))
+    removeBoardContent
+      .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
   VoteBoardContent: async (req, res, next) => {
@@ -235,5 +271,5 @@ module.exports = {
     } else {
       return res.status(200).json({ 'result': '조건을 입력하지 않았습니다.' })
     }
-  }
+  },
 }

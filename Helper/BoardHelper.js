@@ -136,9 +136,59 @@ module.exports = {
       'category': req.params.category,
     }
   },
+  postNewNews: async (data) => {
+    let category = data.category
+    let title = data.title
+    let content = data.image
+    let member_id = data.member_id
+    try {
+      let postNews = await pool.execute(
+        'INSERT INTO `board_contents` (`board_category`, `member_id`, `title`, `content`) \
+        VALUES (?, ?, ?, ?)', [category, member_id, title, content]
+      )
+
+      let [response] = await pool.query(
+        'SELECT * FROM `board_contents` WHERE `document_id` = last_insert_id()'
+      )
+
+      console.log('사오정 뉴스 생성 완료: ', response[0])
+      return response[0]
+    } catch (e) {
+      console.log('사오정 뉴스 중 오류 발생', e)
+      throw new Error('사오정 뉴스 중 오류 발생\n', e)
+    }
+  },
+  getPostNewNewsDto: async (req) => {
+    return {
+      'category': 10000,
+      'title': '사오정소식',
+      'image': req.file.location,
+      'member_id': req.user.member_id
+    }
+  },
   postNewBoardContent: async (data) => {
     try {
       let writePost = await pool.execute(
+        'INSERT INTO `board_contents` \
+        (`board_category`, `member_id`, `title`, `content`, `last_updated_ip`) \
+        VALUES (?, ?, ?, ?, ?)',
+        [data.category, data.member_id, data.title, data.content, data.user_ip]
+      )
+
+      let [checkWritingPost] = await pool.query(
+        'SELECT * FROM `board_contents` \
+        WHERE `document_id`= last_insert_id()'
+      )
+
+      console.log('게시글 생성 완료\n', checkWritingPost[0])
+      return checkWritingPost[0]
+    } catch (e) {
+      throw new Error('게시글 생성 중 오류 발생\n', e)
+    }
+  },
+  postNewQna: async (data) => {
+    try {
+      let postQna = await pool.execute(
         'INSERT INTO `board_contents` \
         (`board_category`, `member_id`, `title`, `content`, `last_updated_ip`) \
         VALUES (?, ?, ?, ?, ?)',
