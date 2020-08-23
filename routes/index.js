@@ -6,6 +6,7 @@ const UserHandler = require('./functions/User/handler')
 const passport = require('../config/passport')
 const BoardHelper = require('../Helper/BoardHelper')
 const StoreHelper = require('../Helper/StoreHelper')
+const Auth = require('./functions/Auth')
 const { kamisSync, eventSync } = require('./functions/kamis-sync/handler')
 const { CreateCategory } = require('../database/models/category')
 // router.get('/users', passport.authenticate('jwt', {session: false}), UserController.index);
@@ -21,9 +22,10 @@ router.put('/admin/api/edit/customers/:member_id.json', passport.authenticate('j
 router.put('/auth/login', UserHandler.ClaimNewToken)
 
 router.get('/hello', passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  console.log(req.passport.member_id)
+  console.log(req.user)
   res.send('HELLO!!')
 })
+
 
 router.get('/generate-user', UserHandler.CreatePhoneUser)
 router.get('/generate-session', UserHandler.CreatePhoneSession)
