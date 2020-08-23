@@ -18,13 +18,20 @@ module.exports.kamisSync = async (req, res, next) => {
       'p_product_cls_code': '01', // 01: Retail, 02: Wholesale
       'p_item_category_code': Number(category),
       'p_country_code': Location.Retail.Daejeon,
-      'p_regday': getToday()
+      // 'p_regday': getToday()
+      'p_regday': '2020-08-20'
     }
     let base_url = await generateURLbyQueryString('http://www.kamis.or.kr/service/price/xml.do', kamis_daily)
     var response = await fetch(base_url)
     if (response.status === 200) {
       response = await response.json()
       let data = response.data.item
+
+      if (response.data.length < 1) {
+        console.log('No Data!!')
+        // res.status(404).json({ result: 'Error', details: 'No Data from KAMIS Server. Try later :)' })
+        return false
+      }
 
       var res_data = data.map(element => {
         return {
@@ -36,16 +43,18 @@ module.exports.kamisSync = async (req, res, next) => {
       res_data = _.toArray(res_data)
 
       try {
+        await sleep(200)
         let result = await Event.createPriceSet(res_data, kamis_daily.p_item_category_code, kamis_daily.p_regday)
         console.log('카테고리 저장완료 :>> ', category)
       } catch (err) {
-        console.log(err)
-        return res.status(400).json({ 'result': 'failed' })
+        console.log('카테고리 저장 중 오류발생 :>> ', err)
+        // return res.status(400).json({ 'result': 'failed' })
       }
     } else {
       throw new Error('Fetching KAMIS Price trends failed ')
     }
   })
+
   return res.status(200).json({ 'result': '데이터 가져오기 완료.' })
 }
 

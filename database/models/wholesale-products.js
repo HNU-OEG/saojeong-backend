@@ -1,7 +1,7 @@
 const dynamoose = require('../dynamodb')
 const schema = require('../schemas/wholesale-products')
 const Product = dynamoose.model('wholesale-products', schema)
-
+const { getToday } = require('../../routes/functions/utils')
 module.exports = {
   model: Product,
   create: (data) => {
@@ -22,5 +22,8 @@ module.exports = {
       unit: data.unit,
       price: data.dpr1 == '-' ? 0 : Number(data.dpr1.replace(/,/g, ''))
     }
-  }
+  },
+  // getTodayProducts: () => {
+  //   const products = await Product.query('')
+  // }
 }
