@@ -8,7 +8,7 @@ module.exports = {
         return false
       }
       return true
-    } catch {
+    } catch (err) {
       throw new Error('Board Content 의 상태를 조회하는데에 실패했습니다.')
     }
   },

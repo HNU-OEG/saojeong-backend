@@ -1,6 +1,5 @@
 const faker = require('faker/locale/ko')
 const pool = require('../config/db')
-const { getWeekday } = require('../routes/functions/utils')
 const weekday = { 'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4, 'sat': 5, 'sun': 6 }
 
 module.exports = {
@@ -9,7 +8,7 @@ module.exports = {
     try {
       let [storeList] = await pool.query(
         'SELECT si.store_indexholder AS store_number, \
-        si.store_name, si.vote_grade_average \
+        si.store_name, si.vote_grade_average, si.store_image \
         FROM `store_information` AS si, `store_vote_grade` AS vg \
         WHERE si.store_id = vg.store_id AND vg.member_id = ? \
         AND vg.is_available = 1 AND si.is_visible = 1', [member_id])
@@ -32,7 +31,7 @@ module.exports = {
       let [storeList] = await pool.query(
         'SELECT si.store_indexholder AS store_number, \
         si.store_name, si.vote_grade_average, si.store_image, \
-        si.vote_grade_count \
+        si.vote_grade_count, 1 AS `starred` \
         FROM store_information AS si, starred_store AS ss \
         WHERE ss.store_id = si.store_id AND ss.member_id = ? \
         AND ss.is_visible = 1 AND si.is_visible = 1', [member_id])
@@ -60,7 +59,7 @@ module.exports = {
 
       let [detail] = await pool.query(
         'SELECT si.store_image, si.store_indexholder, si.store_name, \
-          si.store_intro, si.vote_grade_count, si.vote_grade_average, \
+          si.store_intro, si.vote_grade_count, si.vote_grade_average, si.store_image \
           GROUP_CONCAT(DISTINCT st.telephone) AS telephone, \
           IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS starred \
         FROM `store_information` AS si \
@@ -110,7 +109,7 @@ module.exports = {
     try {
       let storeList = await pool.query(
         'SELECT \
-          `store_indexholder` AS `store_number`, \
+          `store_indexholder` AS `store_number`, store_image, \
           `store_name`, `vote_grade_average`, \
           `vote_grade_count`, `store_id`, \
           IF\
@@ -168,35 +167,23 @@ module.exports = {
   getSqlForReadOrderByType: async (data) => {
     let orderby = data.orderby
     let getOpenStore = 
-    'SELECT si.`store_indexholder` AS `store_number`, \
-      si.`store_name`, si.`vote_grade_average`, \
+    'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
+      si.`store_name`, si.`vote_grade_average`, si.store_image, \
       si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
       IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
-    FROM `store_information` AS `si` \
-    LEFT JOIN `starred_store` AS `ss` \
-    ON `ss`.`member_id` = ? AND `si`.`store_id` = `ss`.`store_id` AND `ss`.`is_visible` = 1 \
-    LEFT JOIN `store_opening_hours` AS `so` \
-    ON `si`.`store_id` = `so`.`store_id` \
-    WHERE `si`.`store_type` = ?\
-    AND so.weekday = WEEKDAY(CURDATE()) \
-    AND (so.start_hour <= CURRENT_TIME() \
-    AND so.end_hour >= CURRENT_TIME()) \
+    FROM `store_information` AS `si`, `store_opening_hours` AS `so` \
+    LEFT JOIN `starred_store` AS `ss` ON `ss`.`member_id` = ? AND `ss`.`is_visible` = 1 \
+    WHERE `si`.`store_type` = ? AND `si`.`store_id` = `so`.`store_id` AND `so`.`weekday` = WEEKDAY(CURDATE()) AND !(so.start_hour <= CURRENT_TIME() AND so.end_hour >= CURRENT_TIME()) \
     ORDER BY ? '
 
     let getClosedStore = 
-    'SELECT si.`store_indexholder` AS `store_number`, \
-      si.`store_name`, si.`vote_grade_average`, \
+    'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
+      si.`store_name`, si.`vote_grade_average`, si.store_image, \
       si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
       IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
-    FROM `store_information` AS `si` \
-    LEFT JOIN `starred_store` AS `ss` \
-    ON `ss`.`member_id` = ? AND `si`.`store_id` = `ss`.`store_id` AND `ss`.`is_visible` = 1 \
-    LEFT JOIN `store_opening_hours` AS `so` \
-    ON `si`.`store_id` = `so`.`store_id` \
-    WHERE `si`.`store_type` = ? \
-    AND so.weekday = WEEKDAY(CURDATE()) \
-    AND (so.start_hour > CURRENT_TIME() \
-    OR so.end_hour < CURRENT_TIME()) \
+    FROM `store_information` AS `si`, `store_opening_hours` AS `so` \
+    LEFT JOIN `starred_store` AS `ss` ON `ss`.`member_id` = ? AND `ss`.`is_visible` = 1 \
+    WHERE `si`.`store_type` = ? AND `si`.`store_id` = `so`.`store_id` AND so.weekday = WEEKDAY(CURDATE()) AND !(so.start_hour <= CURRENT_TIME() AND so.end_hour >= CURRENT_TIME()) \
     ORDER BY ? '
 
     if (orderby === 'vote_grade_average') {
@@ -219,12 +206,14 @@ module.exports = {
     let store_number = data.store_number
     let store_name = data.store_name
     let store_type = data.store_type
+    let store_image = data.store_image
+    let store_intro = data.store_intro
 
     try {
       let create = await pool.execute(
         'INSERT INTO `store_information` \
-        (`store_indexholder`, `store_name`, `store_type`, `store_master`) \
-        VALUES (?, ?, ?, ?)', [store_number, store_name, store_type, member_id]
+        (`store_indexholder`, `store_name`, `store_type`, `store_master`, `store_image`, `store_intro`) \
+        VALUES (?, ?, ?, ?, ?, ?)', [store_number, store_name, store_type, member_id, store_image, store_intro]
       )
 
       let [response] = await pool.query(
@@ -245,6 +234,8 @@ module.exports = {
       'store_type': req.body.store_type,
       'store_name': req.body.store_name,
       'store_number': req.body.store_number,
+      'store_intro': req.body.store_intro,
+      'store_image': req.file.location,
     }
   },
   registerStarredStore: async (data) => {
