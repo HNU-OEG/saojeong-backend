@@ -13,7 +13,10 @@ module.exports = {
     let newPriceSet = new Event(_priceset)
     return newPriceSet.save().then(data => {
       return data
-    }).err(err => console.log(err))
+    })
+      .catch(err => {
+        throw err
+      })
   },
   getParse: async () => {
     return Event.scan('id').exec().then(data => {
