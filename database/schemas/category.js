@@ -5,12 +5,11 @@ module.exports = new Schema({
   name: {
     type: String,
     required: true,
-    hashKey: true
   },
   categoryCode: {
     type: Number,
     required: true,
-    rangeKey: true,
+    hashKey: true,
     index: {
       global: true,
       name: 'categoryCode-index'

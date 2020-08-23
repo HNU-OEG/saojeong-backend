@@ -1,15 +1,15 @@
 const dynamoose = require('../dynamodb')
 const schema = require('../schemas/wholesale-products')
 const Product = dynamoose.model('wholesale-products', schema)
-
+const { getToday } = require('../../routes/functions/utils')
 module.exports = {
   model: Product,
-  create: async (data) => {
+  create: (data) => {
+    console.log('data :>> ', data)
     return new Product(data).save().then(result => {
-      console.log(result)
       return result
     })
-      .err(err => console.log(err))
+      .catch((err, result) => console.log(err, result))
   },
   format: (data) => {
     return {
@@ -20,7 +20,10 @@ module.exports = {
       kindCode: Number(data.kind_code),
       rankCode: Number(data.rank_code),
       unit: data.unit,
-      price: Number(data.dpr1.replace(/,/g, ''))
+      price: data.dpr1 == '-' ? 0 : Number(data.dpr1.replace(/,/g, ''))
     }
-  }
+  },
+  // getTodayProducts: () => {
+  //   const products = await Product.query('')
+  // }
 }

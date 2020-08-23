@@ -11,11 +11,12 @@ module.exports = {
     _priceset.regDate = regDate
     _priceset.kamisProductJSON = priceset
     let newPriceSet = new Event(_priceset)
-    console.log(newPriceSet)
     return newPriceSet.save().then(data => {
-      console.log(data)
       return data
     })
+      .catch(err => {
+        throw err
+      })
   },
   getParse: async () => {
     return Event.scan('id').exec().then(data => {
@@ -24,5 +25,9 @@ module.exports = {
       .catch(err => {
         throw err
       })
+  },
+  getAllParseData: async () => {
+    const events = await Event.scan().exec()
+    return events
   }
 }

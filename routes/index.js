@@ -8,7 +8,7 @@ const BoardHelper = require('../Helper/BoardHelper')
 const StoreHelper = require('../Helper/StoreHelper')
 const Auth = require('./functions/Auth')
 const { kamisSync, eventSync } = require('./functions/kamis-sync/handler')
-
+const { CreateCategory } = require('../database/models/category')
 // router.get('/users', passport.authenticate('jwt', {session: false}), UserController.index);
 // router.post('/auth/tokens', UserHandler.CreateJWTToken);
 
@@ -30,6 +30,8 @@ router.get('/hello', passport.authenticate('jwt', { session: false }), (req, res
 router.get('/generate-user', UserHandler.CreatePhoneUser)
 router.get('/generate-session', UserHandler.CreatePhoneSession)
 
+
+
 // 게시판 관련
 router.post('/api/board', BoardHelper.CreateBoard)
 
@@ -41,4 +43,9 @@ router.get('/search', BoardHandler.SearchBoard)
 router.get('/cron/kamis-daily-sync', kamisSync)
 router.get('/cron/process-event', eventSync)
 
+// 설정
+router.put('/settings/update-category', async (req, res, next) => {
+  let update = await CreateCategory
+  return update
+})
 module.exports = router
