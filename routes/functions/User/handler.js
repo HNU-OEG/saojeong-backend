@@ -211,5 +211,5 @@ module.exports = {
       }
 
     }
-  },
+  }
 }
