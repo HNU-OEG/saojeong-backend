@@ -96,14 +96,14 @@ module.exports = {
   readAllFreeBoardContents: async (data) => {
     try {
       let [contentOrderByCreated] = await pool.query(
-        'SELECT b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
+        'SELECT b.document_id,b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
         FROM board_contents AS b, users AS u \
         WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 \
         ORDER BY b.created_at DESC', [data.category]
       )
 
       let [contentOrderByVoted] = await pool.query(
-        'SELECT b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
+        'SELECT b.document_id,b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
         FROM board_contents AS b, users AS u \
         WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 AND b.voted_count > 0 \
         ORDER BY b.voted_count DESC LIMIT 2', [data.category]
@@ -119,7 +119,7 @@ module.exports = {
   readAllNoticeBoardContents: async (data) => {
     try {
       let [response] = await pool.query(
-        'SELECT b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
+        'SELECT b.document_id, b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
         FROM board_contents AS b, users AS u \
         WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 \
         ORDER BY b.created_at DESC', [data.category]
