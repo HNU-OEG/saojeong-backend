@@ -1,0 +1,17 @@
+version: 0.1
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/saojeong-deployment
+permissions:
+  - object: /home/ubuntu/saojeong-deployment
+    owner: root
+    group: root
+    mode: 755
+hooks:
+  AfterInstall:
+    # location은 프로젝트의 root경로를 기준
+    - location: /home/ubuntu/deploy.sh
+      timeout: 60
+      runas: root
