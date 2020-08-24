@@ -61,4 +61,4 @@ jobs:
           SOURCE_DIR: 'dist'
           
       - name: Code Deploy
-        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=/$GITHUB_SHA.tar
+        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=$GITHUB_SHA.tar
