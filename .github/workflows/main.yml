@@ -47,7 +47,7 @@ jobs:
       
         
       - name: Make tar file
-        run: tar -cvzf ./$GITHUB_SHA.tar.gz .
+        run: tar -cvzf ./$GITHUB_SHA.tar.gz . --warning='file-removed'
         shell: bash
 
       - name: Transfer to S3 for serving static
