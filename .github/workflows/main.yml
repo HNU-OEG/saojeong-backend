@@ -45,13 +45,8 @@ jobs:
           npm ci
           npm run build
           
-      - name: Make tarball Directory
-        run: |
-          mkdir $GITHUB_SHA
-          mv !($GITHUB_SHA) ./$GITHUB_SHA
-      
       - name: Make tar file
-        run: tar -cvzf ./$GITHUB_SHA.tar.gz ./$GITHUB_SHA
+        run: tar -cvzf /$GITHUB_SHA.tar.gz ./$GITHUB_SHA
       - name: Transfer to S3 for serving static
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -64,4 +59,4 @@ jobs:
           SOURCE_DIR: 'dist'
           
       - name: Code Deploy
-        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=$PROJECT_NAME/$GITHUB_SHA.zip
+        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=/$GITHUB_SHA.zip
