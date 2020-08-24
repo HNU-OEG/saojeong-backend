@@ -38,11 +38,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Npm install
-        run: npm install
-
-      - name: Build
-        run: npm run build
+      - name: Npm install and build
+        run: |
+          npm ci
+          npm run build
+      
         
       - name: Make tar file
         run: tar -cvzf ./$GITHUB_SHA.tar.gz .
