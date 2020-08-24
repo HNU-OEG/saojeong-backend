@@ -46,7 +46,7 @@ jobs:
           npm run build
           
       - name: Make tar file
-        run: tar -cvzf ./target/$GITHUB_SHA.tar.gz .
+        run: tar -cvzf ./dist/$GITHUB_SHA.tar.gz .
         continue-on-error: true
         
       - name: Transfer to S3 for serving static
@@ -58,7 +58,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ENV_VAR }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY_ENV_VAR }}
           AWS_REGION: 'ap-northeast-2'
-          SOURCE_DIR: 'target'
+          SOURCE_DIR: 'dist'
           
       - name: Code Deploy
         run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=/$GITHUB_SHA.zip
