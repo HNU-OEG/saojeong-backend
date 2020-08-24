@@ -45,10 +45,8 @@ jobs:
           npm ci
           npm run build
       
-        
       - name: Make tar file
-        run: tar -cvzf ./$GITHUB_SHA.tar.gz . --warning='file-removed'
-        shell: bash
+        run: tar -cvzf ./$GITHUB_SHA.tar.gz .
 
       - name: Transfer to S3 for serving static
         uses: jakejarvis/s3-sync-action@master
