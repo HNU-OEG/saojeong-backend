@@ -18,15 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Configure AWS Credentials" Action For GitHub Actions
-      # You may pin to the exact commit or the version.
-      # uses: aws-actions/configure-aws-credentials@f11c31495459045d1177abd501ebc6c7d3f96354
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        # AWS Access Key ID. This input is required if running in the GitHub hosted environment. It is optional if running in a self-hosted environment that already has AWS credentials, for example on an EC2 instance.
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ENV_VAR }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ENV_VAR }}
-        aws-region: ap-northeast-2
+      - name: "Configure AWS Credentials"
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          # AWS Access Key ID. This input is required if running in the GitHub hosted environment. It is optional if running in a self-hosted environment that already has AWS credentials, for example on an EC2 instance.
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ENV_VAR }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_ENV_VAR }}
+          aws-region: ap-northeast-2
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
