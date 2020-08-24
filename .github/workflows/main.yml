@@ -44,6 +44,11 @@ jobs:
         run: |
           npm ci
           npm run build
+          
+      - name: Make tarball Directory
+        run: |
+          mkdir $GITHUB_SHA
+          mv !($GITHUB_SHA) ./$GITHUB_SHA
       
       - name: Make tar file
         run: tar -cvzf ./$GITHUB_SHA.tar.gz . --exclude=/$GITHUB_SHA.tar.gz
