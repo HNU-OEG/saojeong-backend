@@ -46,7 +46,9 @@ jobs:
           npm run build
           
       - name: Make tar file
-        run: tar -cvzf /$GITHUB_SHA.tar.gz ./$GITHUB_SHA
+        run: tar -cvzf $GITHUB_SHA.tar.gz .
+        continue-on-error: true
+        
       - name: Transfer to S3 for serving static
         uses: jakejarvis/s3-sync-action@master
         with:
