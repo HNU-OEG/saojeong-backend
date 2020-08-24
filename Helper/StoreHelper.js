@@ -16,7 +16,7 @@ module.exports = {
       console.log('평가한 점포 리스트 조회 완료: ', storeList)
       return storeList
     } catch (e) {
-      console.log('평가한 점포 리스트 조회 중 오류 발생' , e)
+      console.log('평가한 점포 리스트 조회 중 오류 발생', e)
       throw new Error('좋아하는 점포 리스트 조회 중 오류 발생')
     }
   },
@@ -39,7 +39,7 @@ module.exports = {
       console.log('좋아하는 점포 리스트 조회 완료: ', storeList)
       return storeList
     } catch (e) {
-      console.log('좋아하는 점포 리스트 조회 중 오류 발생' , e)
+      console.log('좋아하는 점포 리스트 조회 중 오류 발생', e)
       throw new Error('좋아하는 점포 리스트 조회 중 오류 발생')
     }
   },
@@ -59,7 +59,7 @@ module.exports = {
 
       let [detail] = await pool.query(
         'SELECT si.store_image, si.store_indexholder, si.store_name, \
-          si.store_intro, si.vote_grade_count, si.vote_grade_average, si.store_image \
+          si.store_intro, si.vote_grade_count, si.vote_grade_average, si.store_image, \
           GROUP_CONCAT(DISTINCT st.telephone) AS telephone, \
           IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS starred \
         FROM `store_information` AS si \
@@ -89,12 +89,13 @@ module.exports = {
       let response = {
         'store_merchandise': merchandise,
         'store_detail': detail[0],
-        'store_grade': grade[0],
+        'store_grade': grade[0] ? grade[0] : {},
       }
+
       console.log('상점 조회 완료: ', response)
       return response
     } catch (e) {
-      console.log('상점 조회 중 오류 발생' , e)
+      console.log('상점 조회 중 오류 발생', e)
       throw new Error('상점 조회 중 오류 발생')
     }
   },
@@ -105,7 +106,7 @@ module.exports = {
     }
   },
   readAllOrderByGrade: async (data) => {
-    let member_id  = data.member_id
+    let member_id = data.member_id
     try {
       let storeList = await pool.query(
         'SELECT \
@@ -123,7 +124,7 @@ module.exports = {
       console.log('평점순 점포 리스트 조회 완료: ', storeList[0])
       return storeList
     } catch (e) {
-      console.log('평점 순 점포 리스트 조회 중 오류 발생' , e)
+      console.log('평점 순 점포 리스트 조회 중 오류 발생', e)
       throw new Error('평점 순 점포 리스트 조회 중 오류 발생')
     }
   },
@@ -142,7 +143,7 @@ module.exports = {
     try {
       let [openStore] = await pool.query(getOpenStore, [member_id, type, orderby])
       let [closedStore] = await pool.query(getClosedStore, [member_id, type, orderby])
-  
+
       let response = {
         'open_store': openStore,
         'closed_store': closedStore,
@@ -150,13 +151,13 @@ module.exports = {
       console.log('평점순 점포 리스트 조회 완료: ', response)
       return response
     } catch (e) {
-      console.log('평점 순 점포 리스트 조회 중 오류 발생' , e)
+      console.log('평점 순 점포 리스트 조회 중 오류 발생', e)
       throw new Error('평점 순 점포 리스트 조회 중 오류 발생')
     }
   },
   getReadOrderByTypeDto: async (req) => {
-    let type = {'fruits': '과일', 'vegetables': '채소', 'seafoods': '수산',}
-    let orderby = {'grade': 'vote_grade_average', 'name': 'store_name', 'count': 'vote_grade_count',}
+    let type = { 'fruits': '과일', 'vegetables': '채소', 'seafoods': '수산', }
+    let orderby = { 'grade': 'vote_grade_average', 'name': 'store_name', 'count': 'vote_grade_count', }
     // let today = new Date().getDay() + 1
     return {
       'member_id': req.user.member_id,
@@ -166,8 +167,8 @@ module.exports = {
   },
   getSqlForReadOrderByType: async (data) => {
     let orderby = data.orderby
-    let getOpenStore = 
-    'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
+    let getOpenStore =
+      'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
       si.`store_name`, si.`vote_grade_average`, si.store_image, \
       si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
       IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
@@ -176,8 +177,8 @@ module.exports = {
     WHERE `si`.`store_type` = ? AND `si`.`store_id` = `so`.`store_id` AND `so`.`weekday` = WEEKDAY(CURDATE()) AND !(so.start_hour <= CURRENT_TIME() AND so.end_hour >= CURRENT_TIME()) \
     ORDER BY ? '
 
-    let getClosedStore = 
-    'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
+    let getClosedStore =
+      'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
       si.`store_name`, si.`vote_grade_average`, si.store_image, \
       si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
       IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
@@ -274,7 +275,7 @@ module.exports = {
       let unRegister = await pool.execute(
         'UPDATE `starred_store` \
         SET `is_visible` = 0, `removed_at` = CURRENT_TIMESTAMP() \
-        WHERE `member_id` = ? AND `store_id` = ? AND `is_visible` = 1', 
+        WHERE `member_id` = ? AND `store_id` = ? AND `is_visible` = 1',
         [member_id, store_id]
       )
 
@@ -303,11 +304,11 @@ module.exports = {
     let store_id = data.store_id
     try {
       let create = await pool.execute(sql)
-      
+
       let [response] = await pool.query(
         'SELECT `weekday`, TIME_FORMAT(`start_hour`, "%H:%i") AS `open`, \
         TIME_FORMAT(`end_hour`, "%H:%i") AS `close` FROM `store_opening_hours` \
-        WHERE `store_id`= ? ORDER BY `weekday` ASC', 
+        WHERE `store_id`= ? ORDER BY `weekday` ASC',
         [store_id]
       )
 
@@ -359,9 +360,9 @@ module.exports = {
       throw new Error('번호 등록 중 오류 발생')
     }
   },
-  getCreateTelephoneDto: async (req) => {   
+  getCreateTelephoneDto: async (req) => {
     return {
-      'store_id' : req.params.storeId,
+      'store_id': req.params.storeId,
       'body': req.body,
     }
   },
@@ -394,7 +395,7 @@ module.exports = {
 
       let [response] = await pool.query(
         'SELECT * FROM `store_vote_grade` \
-        WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1', 
+        WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1',
         [member_id, store_id]
       )
 
@@ -428,7 +429,7 @@ module.exports = {
       let removeVoteGrade = await pool.execute(
         'UPDATE `store_vote_grade` \
         SET `removed_at` = CURRENT_TIMESTAMP(), `is_available` = 0 \
-        WHERE `member_id` = ? AND `store_id` = ? AND `is_available` = 1', 
+        WHERE `member_id` = ? AND `store_id` = ? AND `is_available` = 1',
         [member_id, store_id]
       )
 
@@ -440,7 +441,7 @@ module.exports = {
 
       let [response] = await pool.query(
         'SELECT * FROM `store_vote_grade` \
-        WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1', 
+        WHERE `member_id`= ? AND `store_id` = ? AND `is_available` = 1',
         [member_id, store_id]
       )
 
@@ -476,14 +477,14 @@ module.exports = {
   getSqlForCreateOrderType: async (data) => {
     let body = data.body
     let author = data.author
-    
+
     let sql = 'INSERT INTO `order_type` (`name`, `author`) VALUES '
-    
+
     let valueList = []
     for (let row in body) {
       valueList.push('(\'' + body[row] + '\', \'' + author + '\')')
     }
-    
+
     sql += valueList.join(', ')
     data.sql = sql
     return data
@@ -513,9 +514,9 @@ module.exports = {
   getSqlForRegisterOrderType: async (data) => {
     let store_id = data.store_id
     let body = data.body
-    
+
     let sql = 'INSERT INTO `store_to_ordertype` (`store_id`, `ordertype_id`) VALUES '
-    
+
     let valueList = []
     for (let row in body) {
       let id = body[row].id

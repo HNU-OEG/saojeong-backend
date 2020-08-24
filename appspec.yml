@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/saojeong/dist
+permissions:
+  - object: /home/saojeong/dist
+    owner: root
+    group: root
+    mode: 755
+hooks:
+  BeforeInstall:
+    # location은 프로젝트의 root경로를 기준
+    - location: /deployments/before_install.sh
+      timeout: 60
+      runas: saojeong
+  AfterInstall:
+      # location은 프로젝트의 root경로를 기준
+      - location: /deployments/after_install.sh
+        timeout: 60
+        runas: saojeong
