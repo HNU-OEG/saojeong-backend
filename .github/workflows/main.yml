@@ -55,10 +55,10 @@ jobs:
           args: --acl public-read --follow-symlinks --delete
         env:
           AWS_S3_BUCKET: 'hnulinc3-deploy'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ENV_VAR }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY_ENV_VAR }}
+          aws-access-key-id: ${{ secrets.AWS_DEPLOYMENT_USER_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_DEPLOYMENT_USER_SECRET }}
           AWS_REGION: 'ap-northeast-2'
           SOURCE_DIR: 'dist'
           
       - name: Code Deploy
-        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=/$GITHUB_SHA.tar.gz
+        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar.gz,key=/$GITHUB_SHA.tar.gz
