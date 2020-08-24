@@ -89,8 +89,9 @@ module.exports = {
       let response = {
         'store_merchandise': merchandise,
         'store_detail': detail[0],
-        'store_grade': grade[0],
+        'store_grade': grade,
       }
+
       console.log('상점 조회 완료: ', response)
       return response
     } catch (e) {
