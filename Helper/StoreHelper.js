@@ -84,7 +84,7 @@ module.exports = {
         WHERE si.store_id  = ? AND vg.member_id = ? AND si.store_id = vg.store_id  AND vg.is_available = 1',
         [store_id, member_id]
       )
-      console.log(grade[0])
+
       detail[0].opening = opening
       let response = {
         'store_merchandise': merchandise,
