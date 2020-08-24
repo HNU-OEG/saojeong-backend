@@ -43,6 +43,7 @@ jobs:
       - name: Npm install and build
         run: |
           rm package-lock.json
+          npm install --package-lock
           npm ci
           npm run build
           
