@@ -84,12 +84,12 @@ module.exports = {
         WHERE si.store_id  = ? AND vg.member_id = ? AND si.store_id = vg.store_id  AND vg.is_available = 1',
         [store_id, member_id]
       )
-
+      console.log(grade[0])
       detail[0].opening = opening
       let response = {
         'store_merchandise': merchandise,
         'store_detail': detail[0],
-        'store_grade': grade,
+        'store_grade': grade[0] ? grade[0] : {},
       }
 
       console.log('상점 조회 완료: ', response)
