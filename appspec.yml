@@ -15,3 +15,8 @@ hooks:
     - location: /deployments/before_install.sh
       timeout: 60
       runas: saojeong
+  AfterInstall:
+      # location은 프로젝트의 root경로를 기준
+      - location: /deployments/after_install.sh
+        timeout: 60
+        runas: saojeong
