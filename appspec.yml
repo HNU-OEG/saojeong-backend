@@ -3,9 +3,9 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ubuntu/saojeong-deployment
+    destination: /home/saojeong/dist
 permissions:
-  - object: /home/ubuntu/saojeong-deployment
+  - object: /home/saojeong/dist
     owner: root
     group: root
     mode: 755
