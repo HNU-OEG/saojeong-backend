@@ -2,6 +2,11 @@ let dynamoose = require('../dynamodb')
 let Schema = dynamoose.Schema
 
 module.exports = new Schema({
+  id: {
+    type: Number,
+    required: true,
+    hashKey: true
+  },
   date: {
     type: Date,
     rangeKey: true
@@ -9,22 +14,23 @@ module.exports = new Schema({
   categoryCode: {
     type: Number
   },
-  // categoryCode: {
-  //   type: Number,
-  //   required: true
-  // },
   itemCode: {
     type: Number,
-    required: true,
-    hashKey: true
+    required: true
   },
   itemName: {
     type: String,
     required: true
   },
+  kindName: {
+    type: String
+  },
   kindCode: {
     type: Number,
     required: true
+  },
+  rank: {
+    type: String
   },
   rankCode: {
     type: Number
