@@ -89,7 +89,14 @@ module.exports = {
       let response = {
         'store_merchandise': merchandise,
         'store_detail': detail[0],
-        'store_grade': grade[0] ? grade[0] : {},
+        'store_grade': grade[0] ? grade[0] : {
+          "kindness_average": 0,
+          "merchandise_average": 0,
+          "price_average": 0,
+          "my_kindness": 0,
+          "my_merchandise": 0,
+          "my_price": 0
+        },
       }
 
       console.log('상점 조회 완료: ', response)
