@@ -27,7 +27,8 @@ module.exports = {
       })
   },
   getAllParseData: async () => {
-    const events = await Event.scan().exec()
+    // 한번에 가져오는 개수 50으로 수정 (너무 많으면 한번에 처리가 불가능함, timeout 180초)
+    const events = await Event.scan().limit(200).exec()
     return events
   }
 }
