@@ -7,7 +7,7 @@ const passport = require('../config/passport')
 const BoardHelper = require('../Helper/BoardHelper')
 const StoreHelper = require('../Helper/StoreHelper')
 const Auth = require('./functions/Auth')
-const { kamisSync, eventSync } = require('./functions/kamis-sync/handler')
+const { kamisSync, eventSync, GetPrice, GetWeeklyTrends, Get3WeeklyTrends } = require('./functions/kamis-sync/handler')
 const { CreateCategory } = require('../database/models/category')
 // router.get('/users', passport.authenticate('jwt', {session: false}), UserController.index);
 // router.post('/auth/tokens', UserHandler.CreateJWTToken);
@@ -40,8 +40,13 @@ router.get('/search', BoardHandler.SearchBoard)
 
 
 // kamis 데이터 동기화
-router.get('/cron/kamis-daily-sync', kamisSync)
+router.get('/cron/kamis-daily-sync/:date?', kamisSync)
 router.get('/cron/process-event', eventSync)
+
+// 시세 조회
+router.get('/market-price/:product_code', GetPrice)
+router.get('/market-price/1w/:product_code', GetWeeklyTrends)
+router.get('/market-price/3w/:product_code', Get3WeeklyTrends)
 
 // 설정
 router.put('/settings/update-category', async (req, res, next) => {
