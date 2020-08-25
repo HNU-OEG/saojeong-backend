@@ -18,7 +18,7 @@ router.delete('/:category/content/:documentId', BoardHandler.RemoveBoardContent)
 router.patch('/:category/content/:documentId', BoardHandler.VoteBoardContent)
 
 // 게시물 댓글 관련
-router.put('/:category/content/:documentId/comment/:pastCommentId?/new', BoardHandler.PostNewComment)
+router.put('/:category/content/:documentId/comment/:pastCommentId/new', BoardHandler.PostNewComment)
 router.patch('/:category/content/:documentId/comment/:commentId', BoardHandler.EditComment)
 router.delete('/:category/content/:documentId/comment/:commentId', BoardHandler.RemoveComment)
 
