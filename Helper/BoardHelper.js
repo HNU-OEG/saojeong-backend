@@ -36,6 +36,30 @@ module.exports = {
       throw new Error('게시판 생성 중 오류 발생')
     }
   },
+  readMyContent: async (data) => {
+    let category = data.category
+    let member_id = data.member_id
+    console.log(member_id, category)
+    try {
+      let [myContent] = await pool.query(
+        'SELECT b.document_id, b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
+        FROM board_contents b, users u WHERE b.board_category = ? AND b.member_id = ? AND b.is_visible = 1 \
+        AND u.member_id = ? ORDER BY b.created_at DESC',
+        [category, member_id, member_id]
+      )
+      console.log('문의게시판 조회 완료: ', myContent)
+      return myContent
+    } catch (e) {
+      console.log('문의게시판 조회 중 오류 발생: ', e)
+      throw new Error('문의게시판 조회 중 오류 발생: ', e)
+    }
+  },
+  getReadMyContentDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'category': req.params.category,
+    }
+  },
   readBoardContent: async (data) => {
     try {
       let [content] = await pool.query(
