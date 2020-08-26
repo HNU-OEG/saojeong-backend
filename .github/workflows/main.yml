@@ -52,7 +52,9 @@ jobs:
           mv -v ./node_modules ./package-lock.json ./package.json dist
         
       - name: Make tar file
-        run: tar -cf ./dist/$GITHUB_SHA.tar ./dist
+        run: |
+          tar -cf ./dist/$GITHUB_SHA.tar ./dist
+          rm -rf server.js node_modules package.json package-lock.json
         continue-on-error: true
         
       - name: Transfer to S3 for serving static
