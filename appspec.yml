@@ -19,4 +19,4 @@ hooks:
       # location은 프로젝트의 root경로를 기준
       - location: ./after_install.sh
         timeout: 60
-        runas: saojeong
+        runas: root
