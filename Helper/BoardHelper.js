@@ -56,6 +56,7 @@ module.exports = {
       let comment = replies.map(reply => {
         if (reply.comment_parent == null) {
           comments[reply.comment_id] = {
+            comment_id: reply.comment_id,
             member_id: reply.member_id,
             author: reply.comment_author,
             content: reply.comment_content,
@@ -65,6 +66,7 @@ module.exports = {
         } else {
           comments[reply.comment_parent].replies = [
             {
+              reply_id: reply.comment_id,
               member_id: reply.member_id,
               author: reply.comment_author,
               content: reply.comment_content,
