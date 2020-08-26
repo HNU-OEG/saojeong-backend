@@ -54,8 +54,7 @@ jobs:
       - name: Make tar file
         run: |
           tar -cf ./dist/$GITHUB_SHA.tar ./dist
-          cd dist
-          rm -rf server.js node_modules package.json package-lock.json
+          rm -rf ./dist/server.js ./dist/node_modules ./dist/package.json ./dist/package-lock.json
         continue-on-error: true
         
       - name: Transfer to S3 for serving static
