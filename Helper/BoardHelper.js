@@ -53,9 +53,10 @@ module.exports = {
         ORDER BY comm.comment_created_at ASC', [data.document_id])
 
       var comments = []
-      let comment = replies.map(reply => {
+      replies.map(reply => {
         if (reply.comment_parent == null) {
           comments[reply.comment_id] = {
+            commnet_id: reply.comment_id,
             member_id: reply.member_id,
             author: reply.comment_author,
             content: reply.comment_content,
@@ -63,19 +64,21 @@ module.exports = {
             replies: []
           }
         } else {
-          comments[reply.comment_parent].replies = [
-            {
-              member_id: reply.member_id,
-              author: reply.comment_author,
-              content: reply.comment_content,
-              created_at: reply.comment_created_at,
-            }]
+          comments[reply.comment_parent].replies.push({
+            commnet_id: reply.comment_id,
+            member_id: reply.member_id,
+            author: reply.comment_author,
+            content: reply.comment_content,
+            created_at: reply.comment_created_at,
+          })
         }
       })
 
       var comments = comments.filter(function (el) {
         return el != null
       })
+
+      console.log('comments :>> ', comments)
 
       let readCountQuery = await BoardHelper2.incrementBoardCount(data.document_id)
       let logging_read = await BoardHelper2.loggingReadLog(data.member_id, data.document_id)
