@@ -45,8 +45,7 @@ router.get('/cron/process-event', eventSync)
 
 // 시세 조회
 router.get('/market-price/:product_code', GetPrice)
-router.get('/market-price/1w/:product_code', GetWeeklyTrends)
-router.get('/market-price/3w/:product_code', Get3WeeklyTrends)
+router.get('/market-price/:week/:product_code', GetWeeklyTrends)
 
 // 설정
 router.put('/settings/update-category', async (req, res, next) => {
