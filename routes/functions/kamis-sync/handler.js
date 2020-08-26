@@ -192,15 +192,14 @@ module.exports.GetPrice = async (req, res, next) => {
 
 module.exports.GetWeeklyTrends = async (req, res, next) => {
   let product_code = Number(req.params.product_code)
-  let week_timestamp = await PickBy1Weeks
+  let week = req.params.week
+  let week_timestamp = (week === '1w' ? await PickBy1Weeks : await PickBy3Weeks)
+
   let trends = []
   for (const [key, time] of Object.entries(week_timestamp())) {
     let [query] = await Product.getPriceInfomationByIdAndTimestamp(product_code, time)
     trends.push(query)
   }
-
-  console.log('trends :>> ', trends)
-
 
   var data = []
 
@@ -211,35 +210,29 @@ module.exports.GetWeeklyTrends = async (req, res, next) => {
       itemName: elem.itemName,
       unit: elem.unit,
       rank: elem.rank,
-      kindName: elem.kindName
+      kindName: elem.kindName,
+      price: elem.price === 0 ? null : elem.price
     })
   }
-  return res.json(data)
-}
 
-module.exports.Get3WeeklyTrends = async (req, res, next) => {
-  let product_code = Number(req.params.product_code)
-  let week_timestamp = await PickBy3Weeks
-  let trends = []
-  for (const [key, time] of Object.entries(week_timestamp())) {
-    let [query] = await Product.getPriceInfomationByIdAndTimestamp(product_code, time)
-    trends.push(query)
-  }
-
-  console.log('trends :>> ', trends)
-
-
-  var data = []
-
-  for (let index = 0; index < trends.length - 1; index++) {
-    const elem = trends[index]
-    data.push({
-      date: moment(elem.date).format('MM/DD'),
-      itemName: elem.itemName,
-      unit: elem.unit,
-      rank: elem.rank,
-      kindName: elem.kindName
+  var dataset = []
+  for (let index = 0; index < data.length; index++) {
+    const element = data[index]
+    dataset.push({
+      x: element.date,
+      y: element.price
     })
   }
-  return res.json(data)
+
+  let result = {
+    itemInfo: {
+      itemName: data[0].itemName,
+      unit: data[0].unit,
+      rank: data[0].rank,
+      kindName: data[0].kindName
+    },
+    dataset
+  }
+
+  return res.json(result)
 }
