@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: |
           npm run build
-          mv -v ./node_modules ./package-lock.json ./package.json dist
+          mv -v ./node_modules ./package-lock.json ./package.json ./deployments/after_install.sh ./deployments/before_install.sh dist
         
       - name: Make tar file
         run: |
