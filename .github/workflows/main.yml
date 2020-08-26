@@ -40,15 +40,19 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Npm install and build
+      - name: Npm install
         run: |
           rm package-lock.json
           npm install --package-lock
           npm ci
+      
+      - name: Build
+        run: |
           npm run build
-          
+          mv ./node_modules ./package-lock.json ./package.json node_modules dist
+        
       - name: Make tar file
-        run: tar -cf ./dist/$GITHUB_SHA.tar .
+        run: tar -cf ./dist/$GITHUB_SHA.tar ./dist
         continue-on-error: true
         
       - name: Transfer to S3 for serving static
@@ -62,5 +66,5 @@ jobs:
           AWS_REGION: 'ap-northeast-2'
           SOURCE_DIR: 'dist'
           
-      - name: Code Deploy
-        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=$GITHUB_SHA.tar
+#       - name: Code Deploy
+#         run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=$GITHUB_SHA.tar
