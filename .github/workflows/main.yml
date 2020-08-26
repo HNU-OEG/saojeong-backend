@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - feature/#92
 
 jobs:
   deploy:
