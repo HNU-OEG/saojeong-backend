@@ -49,7 +49,7 @@ jobs:
       - name: Build
         run: |
           npm run build
-          mv ./node_modules ./package-lock.json ./package.json node_modules dist
+          mv -v ./node_modules ./package-lock.json ./package.json dist
         
       - name: Make tar file
         run: tar -cf ./dist/$GITHUB_SHA.tar ./dist
