@@ -54,7 +54,7 @@ jobs:
         
       - name: Make tar file
         run: |
-          tar -cf ./dist/$GITHUB_SHA.tar ./dist
+          tar -cvf ./dist/$GITHUB_SHA.tar ./dist
           rm -rf ./dist/server.js ./dist/node_modules ./dist/package.json ./dist/package-lock.json
         continue-on-error: true
         
