@@ -50,12 +50,12 @@ jobs:
       - name: Build
         run: |
           npm run build
-          mv -v ./node_modules ./package-lock.json ./package.json ./deployments/after_install.sh ./deployments/before_install.sh dist
+          mv -v ./node_modules ./package-lock.json ./package.json ./deployments/after_install.sh ./deployments/before_install.sh ./appspec.yml dist
         
       - name: Make tar file
         run: |
           tar -cvf ./dist/$GITHUB_SHA.tar ./dist
-          rm -rf ./dist/server.js ./dist/node_modules ./dist/package.json ./dist/package-lock.json
+          rm -rf ./dist/server.js ./dist/node_modules ./dist/package.json ./dist/package-lock.json ./after_install.sh ./before_install.sh ./appspec.yml
         continue-on-error: true
         
       - name: Transfer to S3 for serving static
