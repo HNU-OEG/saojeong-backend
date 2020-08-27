@@ -148,8 +148,8 @@ module.exports = {
     let getClosedStore = data.closed_store
 
     try {
-      let [openStore] = await pool.query(getOpenStore, [member_id, type, orderby])
-      let [closedStore] = await pool.query(getClosedStore, [member_id, type, orderby])
+      let [openStore] = await pool.query(getOpenStore, [member_id, orderby])
+      let [closedStore] = await pool.query(getClosedStore, [member_id, orderby])
 
       let response = {
         'open_store': openStore,
@@ -165,7 +165,7 @@ module.exports = {
   getReadOrderByTypeDto: async (req) => {
     let type = { 'fruits': '과일', 'vegetables': '채소', 'seafoods': '수산', }
     let orderby = { 'grade': 'vote_grade_average', 'name': 'store_name', 'count': 'vote_grade_count', }
-    // let today = new Date().getDay() + 1
+
     return {
       'member_id': req.user.member_id,
       'type': type[req.params.type],
@@ -174,25 +174,22 @@ module.exports = {
   },
   getSqlForReadOrderByType: async (data) => {
     let orderby = data.orderby
+
     let getOpenStore =
-      'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
-      si.`store_name`, si.`vote_grade_average`, si.store_image, \
-      si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
-      IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
-    FROM `store_information` AS `si`, `store_opening_hours` AS `so` \
-    LEFT JOIN `starred_store` AS `ss` ON `ss`.`member_id` = ? AND `ss`.`is_visible` = 1 \
-    WHERE `si`.`store_type` = ? AND `si`.`store_id` = `so`.`store_id` AND `so`.`weekday` = WEEKDAY(CURDATE()) AND !(so.start_hour <= CURRENT_TIME() AND so.end_hour >= CURRENT_TIME()) \
-    ORDER BY ? '
+      'SELECT DISTINCT si.store_id, si.store_name, si.store_indexholder AS store_number, si.store_intro, si.store_image, si.vote_grade_average, si.vote_grade_count, IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
+      FROM store_information si \
+      LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
+      LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
+      WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND (so.start_hour <= NOW() AND so.end_hour > NOW()) \
+      ORDER BY ?'
 
     let getClosedStore =
-      'SELECT DISTINCT si.`store_indexholder` AS `store_number`, \
-      si.`store_name`, si.`vote_grade_average`, si.store_image, \
-      si.`vote_grade_count`, si.`store_id`, si.`store_intro`, \
-      IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
-    FROM `store_information` AS `si`, `store_opening_hours` AS `so` \
-    LEFT JOIN `starred_store` AS `ss` ON `ss`.`member_id` = ? AND `ss`.`is_visible` = 1 \
-    WHERE `si`.`store_type` = ? AND `si`.`store_id` = `so`.`store_id` AND so.weekday = WEEKDAY(CURDATE()) AND !(so.start_hour <= CURRENT_TIME() AND so.end_hour >= CURRENT_TIME()) \
-    ORDER BY ? '
+      'SELECT DISTINCT si.store_id, si.store_name, si.store_indexholder AS store_number, si.store_intro, si.store_image, si.vote_grade_average, si.vote_grade_count, IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
+      FROM store_information si \
+      LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
+      LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
+      WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND !(so.start_hour <= NOW() AND so.end_hour > NOW()) \
+      ORDER BY ?'
 
     if (orderby === 'vote_grade_average') {
       getOpenStore += ' DESC'
