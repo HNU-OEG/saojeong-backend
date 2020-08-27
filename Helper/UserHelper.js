@@ -193,7 +193,6 @@ module.exports = {
       throw new Error('UserID 조회 중 오류 발생')
     }
   },
-
   checkUserAuthenticatedAvailability: async (member_id) => {
     try {
       let user = await pool.query('select users.member_id, users.enabled, refresh_token, oauth_id.is_activated, oauth_id.expired_at from users, oauth_id where users.member_id = oauth_id.member_id and users.member_id = ? order by expired_at desc limit 1', [member_id])
@@ -274,5 +273,32 @@ module.exports = {
       console.error('Error :>> ', err)
       throw new Error('OAuth 인증을 통한 인증정보 저장에 실패했습니다.')
     }
-  }
+  },
+  editUserImage: async (data) => {
+    let image = data.image
+    let member_id = data.member_id
+    try {
+      let edit = await pool.execute(
+        'UPDATE users SET user_image = ? WHERE member_id = ?',
+        [image, member_id]
+      )
+
+      let [response] = await pool.query(
+        'SELECT member_id, nickname, user_image AS image FROM `users` WHERE `member_id` = ?',
+        [member_id]
+      )
+
+      console.log('프로필 이미지 수정 완료: ', response[0])
+      return response[0]
+    } catch (e) {
+      console.log('프로필 이미지 수정 중 오류 발생', e)
+      throw new Error('프로필 이미지 수정 중 오류 발생\n', e)
+    }
+  },
+  getEditUserImageDto: async (req) => {
+    return {
+      'member_id': req.user.member_id,
+      'image': req.file.location,
+    }
+  },
 }
