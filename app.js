@@ -6,6 +6,7 @@ const logger = require('morgan')
 require('dotenv').config()
 
 const Sentry = require('./config/sentry')
+const cron = require('./config/cron')
 
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
@@ -44,7 +45,7 @@ app.use('/auth', authRouter)
 app.use('/api/store', passport.authenticate('jwt', { session: false }), storeRouter)
 // app.use('/api/store', storeRouter)
 app.use('/api/board', passport.authenticate('jwt', { session: false }), boardRouter)
-app.use('/api/foods', passport.authenticate('jwt', { session: false}), seasonalRouter)
+app.use('/api/foods', passport.authenticate('jwt', { session: false }), seasonalRouter)
 
 // The error handler must be before any other error middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler())
