@@ -9,6 +9,7 @@ let upload = require('../config/s3')
 router.post('/', BoardHelper.CreateBoard)
 
 // 게시글 관련
+router.get('/:category/content/my', BoardHandler.ReadMyContent)
 router.get('/:category/content', BoardHandler.ReadAllBoardContents)
 router.get('/:category/content/:documentId', BoardHandler.ReadBoardContent)
 router.post('/:category/content', BoardHandler.PostNewBoardContent)

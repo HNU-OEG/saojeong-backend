@@ -3,6 +3,7 @@ const UserHelper = require('../../../Helper/UserHelper')
 const pool = require('../../../config/db')
 const jwt = require('jsonwebtoken')
 const randToken = require('rand-token')
+const S3Helper = require('../../../Helper/S3Helper')
 
 module.exports = {
   ClaimNewGuestUser: async (req, res, next) => {
@@ -211,5 +212,21 @@ module.exports = {
       }
 
     }
-  }
+  },
+  EditUserImage: async (req, res, next) => {
+    /**
+     * URI: [PUT, /admin/api/edit/customers/image]
+     * body : {
+     *    'image': 이미지파일
+     * }
+     */
+    if (!S3Helper.checkUploaded(req.file.location)) {
+      res.status(503).send('프로필 이미지 S3 업로드 실패!')
+    }
+    let data = await UserHelper.getEditUserImageDto(req)
+    let response = UserHelper.editUserImage(data)
+    response
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
 }

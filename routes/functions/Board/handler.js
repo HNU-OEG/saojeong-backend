@@ -14,6 +14,16 @@ const board_category = {
 }
 
 module.exports = {
+  ReadMyContent: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/board/:category/content/my]
+     */
+    let data = await BoardHelper.getReadMyContentDto(req)
+    let myContent = BoardHelper.readMyContent(data)
+    myContent
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
   ReadBoardContent: async (req, res, next) => {
     /**
      * URI: [GET, /api/board/:category/content/:documentId]
