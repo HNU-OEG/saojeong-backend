@@ -29,7 +29,7 @@ module.exports = {
     let member_id = data.member_id
     try {
       let [storeList] = await pool.query(
-        'SELECT si.store_indexholder AS store_number, \
+        'SELECT si.store_id, si.store_indexholder AS store_number, \
         si.store_name, si.vote_grade_average, si.store_image, \
         si.vote_grade_count, 1 AS `starred` \
         FROM store_information AS si, starred_store AS ss \
