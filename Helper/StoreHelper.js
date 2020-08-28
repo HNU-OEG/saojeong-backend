@@ -148,8 +148,8 @@ module.exports = {
     let getClosedStore = data.closed_store
 
     try {
-      let [openStore] = await pool.query(getOpenStore, [member_id, orderby])
-      let [closedStore] = await pool.query(getClosedStore, [member_id, orderby])
+      let [openStore] = await pool.query(getOpenStore, [member_id, type, orderby])
+      let [closedStore] = await pool.query(getClosedStore, [member_id, type, orderby])
 
       let response = {
         'open_store': openStore,
@@ -180,7 +180,7 @@ module.exports = {
       FROM store_information si \
       LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
       LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
-      WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND (so.start_hour <= NOW() AND so.end_hour > NOW()) \
+      WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND (so.start_hour <= NOW() AND so.end_hour > NOW()) AND si.store_type = ?\
       ORDER BY ?'
 
     let getClosedStore =
@@ -188,7 +188,7 @@ module.exports = {
       FROM store_information si \
       LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
       LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
-      WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND !(so.start_hour <= NOW() AND so.end_hour > NOW()) \
+      WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND !(so.start_hour <= NOW() AND so.end_hour > NOW()) AND si.store_type = ?\
       ORDER BY ?'
 
     if (orderby === 'vote_grade_average') {
