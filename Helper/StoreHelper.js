@@ -181,7 +181,7 @@ module.exports = {
       'SELECT DISTINCT si.store_id, si.store_name, si.store_indexholder AS store_number, si.store_intro, si.store_image, si.vote_grade_average, si.vote_grade_count, IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
       FROM store_information si \
       LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
-      LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
+      LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? AND ss.is_visible = 1 \
       WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND (so.start_hour <= NOW() AND so.end_hour > NOW()) AND si.store_type = ?\
       ORDER BY '
 
@@ -189,7 +189,7 @@ module.exports = {
       'SELECT DISTINCT si.store_id, si.store_name, si.store_indexholder AS store_number, si.store_intro, si.store_image, si.vote_grade_average, si.vote_grade_count, IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
       FROM store_information si \
       LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
-      LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
+      LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? AND ss.is_visible = 1 \
       WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND !(so.start_hour <= NOW() AND so.end_hour > NOW()) AND si.store_type = ?\
       ORDER BY '
 
