@@ -146,10 +146,12 @@ module.exports = {
     let orderby = data.orderby
     let getOpenStore = data.open_store
     let getClosedStore = data.closed_store
+    console.log(orderby)
+    console.log(getOpenStore)
 
     try {
-      let [openStore] = await pool.query(getOpenStore, [member_id, type, orderby])
-      let [closedStore] = await pool.query(getClosedStore, [member_id, type, orderby])
+      let [openStore] = await pool.query(getOpenStore, [member_id, type])
+      let [closedStore] = await pool.query(getClosedStore, [member_id, type])
 
       let response = {
         'open_store': openStore,
@@ -181,7 +183,7 @@ module.exports = {
       LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
       LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
       WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND (so.start_hour <= NOW() AND so.end_hour > NOW()) AND si.store_type = ?\
-      ORDER BY ?'
+      ORDER BY '
 
     let getClosedStore =
       'SELECT DISTINCT si.store_id, si.store_name, si.store_indexholder AS store_number, si.store_intro, si.store_image, si.vote_grade_average, si.vote_grade_count, IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
@@ -189,17 +191,14 @@ module.exports = {
       LEFT JOIN store_opening_hours so ON si.store_id = so.store_id \
       LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? \
       WHERE si.is_visible = 1 AND so.weekday = WEEKDAY(NOW()) AND !(so.start_hour <= NOW() AND so.end_hour > NOW()) AND si.store_type = ?\
-      ORDER BY ?'
+      ORDER BY '
 
-    if (orderby === 'vote_grade_average') {
-      getOpenStore += ' DESC'
-      getClosedStore += ' DESC'
+    if (orderby === 'vote_grade_average' || orderby === 'vote_grade_count') {
+      getOpenStore += orderby + ' DESC'
+      getClosedStore += orderby + ' DESC'
     } else if (orderby === 'store_name') {
-      getOpenStore += ' ASC'
-      getClosedStore += ' ASC'
-    } else if (orderby === 'vote_grade_count') {
-      getOpenStore += ' DESC'
-      getClosedStore += ' DESC'
+      getOpenStore += orderby + ' ASC'
+      getClosedStore += orderby + ' ASC'
     }
 
     data.open_store = getOpenStore
