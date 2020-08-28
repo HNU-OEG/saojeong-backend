@@ -29,7 +29,10 @@ module.exports = {
         reference_id: result[0].id,
         member_id: result[0].member_id,
         nickname: result[0].nickname,
-        usertype: result[0].type
+        usertype: result[0].type,
+        username: '',
+        usertype: 0,
+        Provider: 'JWT'
       }
       const refreshToken = await UserHelper.claimJWTRefreshToken_firstuser(jwtpayload_data.member_id)
       const token = await UserHelper.claimJWTAccessToken(jwtpayload_data)
@@ -161,7 +164,10 @@ module.exports = {
             let refreshPayload = {
               member_id: pl.member_id,
               nickname: pl.nickname,
-              username: pl.username
+              username: pl.username,
+              usertype: pl.usertype,
+              reference_id: pl.reference_id,
+              Provider: pl.Provider,
             }
             let accessToken = await UserHelper.claimJWTAccessToken(refreshPayload)
             return res.status(201).json({ 'accessToken': accessToken })
