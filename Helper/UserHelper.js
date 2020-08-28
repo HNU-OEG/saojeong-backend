@@ -52,15 +52,13 @@ module.exports = {
     }
   },
   claimAccessTokenByMemberId: async (member_id) => {
+
     try {
-      let [result] = await pool.query('SELECT u.member_id, u.username, u.email, u.nickname, u.type, o.provider, o.oauth_version, o.access_token, o.refresh_token, o.expired_at, o.is_activated FROM users AS u, oauth_id AS o WHERE u.member_id = o.member_id AND o.is_activated=1 AND u.enabled=1 AND o.provider != "JWT" AND u.member_id = ?', [member_id])
-      let jwtpayload_data = {
-        reference_id: result[0].id,
-        Provider: result[0].provider,
+      let [result] = await pool.query('select member_id, nickname, type from users where member_id=?', [member_id])
+      let payload = {
         member_id: result[0].member_id,
-        username: result[0].username,
         nickname: result[0].nickname,
-        usertype: result[0].type
+        usertype: result[0].type,
       }
       let accessToken = await module.exports.claimJWTAccessToken(payload)
       return accessToken
