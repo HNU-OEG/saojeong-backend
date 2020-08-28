@@ -13,7 +13,6 @@ const leftPad = require('left-pad')
 module.exports.kamisSync = async (req, res, next) => {
   let p_regday = req.query.date || getToday()
   let month = req.query.month // month date must be YYYY-MM
-
   if (month != null) {
     let DaysOfMonth = moment(month, 'YYYY-MM').daysInMonth()
     for (let index = 1; index < DaysOfMonth + 1; index++) {
