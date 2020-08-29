@@ -54,11 +54,15 @@ module.exports = {
   claimAccessTokenByMemberId: async (member_id) => {
 
     try {
-      let [result] = await pool.query('select member_id, nickname, type from users where member_id=?', [member_id])
+      let [result] = await pool.query('SELECT u.id, u.member_id, u.username, u.nickname, u.password, u.gender, u.email, u.created_at, u.type, u.user_image, oauth.provider, oauth.oauth_version, oauth.expired_at, oauth.is_activated FROM users u, oauth_id oauth WHERE u.member_id = oauth.member_id AND u.member_id = ? ORDER BY expired_at DESC LIMIT 1', [member_id])
       let payload = {
         member_id: result[0].member_id,
         nickname: result[0].nickname,
-        usertype: result[0].type,
+        username: result[0].username,
+        email: result[0].email || null,
+        type: result[0].type || 1,
+        provider: result[0].provider || null,
+        provider_version: result[0].provider_version || null
       }
       let accessToken = await module.exports.claimJWTAccessToken(payload)
       return accessToken
@@ -301,4 +305,24 @@ module.exports = {
       'image': req.file.location,
     }
   },
+  getUserInfo: async (member_id) => {
+    let [user] = await pool.query('SELECT u.id, u.member_id, u.username, u.nickname, u.password, u.gender, u.email, u.created_at, u.type, u.user_image, oauth.provider, oauth.oauth_version, oauth.expired_at, oauth.is_activated FROM users u, oauth_id oauth WHERE u.member_id = oauth.member_id AND u.member_id = ? ORDER BY expired_at DESC LIMIT 1', [member_id])
+    console.log('GETUSERINFO', user)
+    return {
+      'id': user[0].id,
+      'member_id': user[0].member_id,
+      'username': user[0].username,
+      'nickname': user[0].nickname,
+      'password': user[0].password,
+      'gender': user[0].gender,
+      'email': user[0].email,
+      'created_at': user[0].created_at,
+      'type': user[0].type,
+      'user_image': user[0].user_image,
+      'provider': user[0].provider,
+      'oauth_version': user[0].oauth_version,
+      'expired_at': user[0].expired_at,
+      'is_activated': user[0].is_activated
+    }
+  }
 }
