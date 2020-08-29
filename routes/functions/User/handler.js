@@ -145,7 +145,7 @@ module.exports = {
   ClaimNewToken: async (req, res, next) => {
     let access_token = req.headers['authorization'].split(' ')[1]
     let member_id = jwt.decode(access_token).member_id
-    let refresh_token = req.body.refreshToken
+    let refresh_token = req.body.RefreshToken
 
     try {
       let user_status = await UserHelper.checkUserStatus(member_id)
