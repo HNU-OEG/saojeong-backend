@@ -149,23 +149,36 @@ module.exports = {
 
     try {
       let user_status = await UserHelper.checkUserStatus(member_id)
+
+      // user가 탈퇴하지 않은 사용자라면?
       if (!user_status == false) {
+        // 사용자가 정지되었는지 확인
         let user = await UserHelper.checkUserAuthenticatedAvailability(member_id) // 사용자 사용 가능한지 확인
+
         if (!user == false) { //사용자가 사용가능하면
           let pl = jwt.verify(access_token, process.env.JWT_SECRET)
-          var expirationDate = new Date(pl.exp)
-          console.log('만료까지 ', Math.floor(expirationDate - (new Date() / 1000)), '초 남음.')
 
+          let userinfo = await UserHelper.getUserInfo(pl.member_id)
+          console.log('USERINFO ===> ', userinfo)
+          // FIXME: 날짜가 1970년일리가없어!!!
+          var expirationDate = new Date(pl.exp)
+          console.log('expirationDate :>> ', expirationDate)
+          console.log('만료까지 ', Math.floor(expirationDate - (new Date() / 1000)), '초 남음.')
+          console.log('pl :>> ', pl)
           if ((expirationDate - new Date()) > 60000) {
-            return res.status(200).json({ 'accessToken': access_token })
+            return res.status(200).json({ 'AccessToken': access_token })
           } else {
             let refreshPayload = {
-              member_id: pl.member_id,
-              nickname: pl.nickname,
-              username: pl.username
+              member_id: userinfo.member_id,
+              nickname: userinfo.nickname,
+              username: userinfo.username,
+              email: userinfo.email || null,
+              type: userinfo.type || 1,
+              provider: userinfo.provider || null,
+              provider_version: userinfo.provider_version || null
             }
             let accessToken = await UserHelper.claimJWTAccessToken(refreshPayload)
-            return res.status(201).json({ 'accessToken': accessToken })
+            return res.status(201).json({ 'AccessToken': accessToken })
           }
         } else {
           // 사용자가 정지되었을 때
@@ -176,6 +189,7 @@ module.exports = {
       }
 
     } catch (err) {
+      // 만료된 토큰을 내밀땐...
       if (err.name == 'TokenExpiredError') {
         let claim_accessToken = await UserHelper.claimAccessTokenByMemberId(member_id)
         let claim_refreshtoken = await UserHelper.claimJWTRefreshToken(member_id, refresh_token) //사용자 oauth refresh토큰 발급
