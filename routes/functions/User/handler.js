@@ -4,6 +4,7 @@ const pool = require('../../../config/db')
 const jwt = require('jsonwebtoken')
 const randToken = require('rand-token')
 const S3Helper = require('../../../Helper/S3Helper')
+const StoreHelper = require('../../../Helper/StoreHelper')
 
 module.exports = {
   ClaimNewGuestUser: async (req, res, next) => {
