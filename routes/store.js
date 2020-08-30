@@ -3,6 +3,7 @@ var router = express.Router()
 const StoreHelper = require('../Helper/StoreHelper')
 const StoreHandler = require('./functions/Store/handler.js')
 let upload = require('../config/s3')
+const { calculateGrade } = require('../Helper/StoreHelper')
 
 // 점포 조회 관련
 router.get('/', StoreHandler.ReadAllStoresOrderByGrade)
@@ -30,11 +31,11 @@ router.post('/:storeId/votegrade', StoreHandler.CreateVoteGrade)
 router.put('/:storeId/votegrade', StoreHandler.EditVoteGrade)
 router.post('/:storeId/ordertype', StoreHandler.RegisterOrderTypeOnStore)
 
-
+// 새벽에 계산
+StoreHelper.calculateGrade
 
 // 로직 정의 필요
 router.post('/merchandise', StoreHelper.CreateStoreMerchandise)
-
 
 
 module.exports = router
