@@ -1,5 +1,5 @@
 const pool = require('../config/db')
-const { readFile } = require('fs').promises
+const fs = require('fs').promises
 const path = require('path')
 const jwt = require('jsonwebtoken')
 const randToken = require('rand-token')
@@ -23,7 +23,7 @@ module.exports = {
   generateGuestNickname: async () => {
 
     try {
-      const result = await readFile(path.join(__dirname, 'dictionary.txt'), 'utf8')
+      const result = await fs.readFile(path.join(__dirname, 'dictionary.txt'), 'utf8')
       var d = result.split('\n')
       var item = d[Math.floor(Math.random() * d.length)]
       nickname = '익명의 ' + item
