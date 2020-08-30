@@ -305,7 +305,6 @@ module.exports = {
   },
   getUserInfo: async (member_id) => {
     let [user] = await pool.query('SELECT u.id, u.member_id, u.username, u.nickname, u.password, u.gender, u.email, u.created_at, u.type, u.user_image, oauth.provider, oauth.oauth_version, oauth.expired_at, oauth.is_activated FROM users u, oauth_id oauth WHERE u.member_id = oauth.member_id AND u.member_id = ? ORDER BY expired_at DESC LIMIT 1', [member_id])
-    console.log('GETUSERINFO', user)
     return {
       'id': user[0].id,
       'member_id': user[0].member_id,
