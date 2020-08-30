@@ -191,7 +191,7 @@ module.exports = {
         let claim_refreshtoken = await UserHelper.claimJWTRefreshToken(member_id, refresh_token) //사용자 oauth refresh토큰 발급
         console.log(claim_accessToken, claim_refreshtoken)
         if (!claim_refreshtoken == 0) {
-          return res.status(201).json({ 'member_id': member_id, 'accessToken': claim_accessToken, 'refreshToken': claim_refreshtoken })
+          return res.status(201).json({ 'member_id': member_id, 'AccessToken': claim_accessToken, 'RefreshToken': claim_refreshtoken })
         }
         // Refresh Token이 더이상 사용할 수 없을 때
         return res.status(401).json({ 'result': 'error', 'message': '이 Refresh Token은 사용할 수 없습니다. 로그인을 다시 시도해주세요.' })
