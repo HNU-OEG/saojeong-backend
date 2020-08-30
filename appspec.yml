@@ -6,8 +6,8 @@ files:
     destination: /home/saojeong/dist
 permissions:
   - object: /home/saojeong/dist
-    owner: root
-    group: root
+    owner: ubuntu
+    group: ubuntu
     mode: 755
 hooks:
   BeforeInstall:
