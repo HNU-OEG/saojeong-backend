@@ -31,9 +31,9 @@ module.exports = {
     let member_id = data.member_id
     try {
       let [storeList] = await pool.query(
-        'SELECT si.store_id, si.store_indexholder AS store_number, \
-        si.store_name, si.vote_grade_average, si.store_image, \
-        si.vote_grade_count, 1 AS `starred` \
+        'SELECT DISTINCT si.store_id, si.store_indexholder AS store_number, \
+          si.store_name, si.vote_grade_average, si.store_image, \
+          si.vote_grade_count, 1 AS `starred` \
         FROM store_information AS si, starred_store AS ss \
         WHERE ss.store_id = si.store_id AND ss.member_id = ? \
         AND ss.is_visible = 1 AND si.is_visible = 1', [member_id])
