@@ -4,7 +4,8 @@ const pool = require('../../../config/db')
 const jwt = require('jsonwebtoken')
 const randToken = require('rand-token')
 const S3Helper = require('../../../Helper/S3Helper')
-
+const moment = require('moment')
+moment.locale('ko')
 module.exports = {
   ClaimNewGuestUser: async (req, res, next) => {
     let nickname = await UserHelper.generateGuestNickname()
@@ -157,15 +158,10 @@ module.exports = {
 
         if (!user == false) { //사용자가 사용가능하면
           let pl = jwt.verify(access_token, process.env.JWT_SECRET)
-
           let userinfo = await UserHelper.getUserInfo(pl.member_id)
-          console.log('USERINFO ===> ', userinfo)
-          // FIXME: 날짜가 1970년일리가없어!!!
-          var expirationDate = new Date(pl.exp)
-          console.log('expirationDate :>> ', expirationDate)
-          console.log('만료까지 ', Math.floor(expirationDate - (new Date() / 1000)), '초 남음.')
-          console.log('pl :>> ', pl)
-          if ((expirationDate - new Date()) > 60000) {
+          var expirationDate = moment.unix(pl.exp)
+          let expiry_seconds = (expirationDate - Date.now()) / 1000
+          if (expiry_seconds > 3600) {
             return res.status(200).json({ 'AccessToken': access_token })
           } else {
             let refreshPayload = {
