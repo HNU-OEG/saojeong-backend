@@ -65,8 +65,8 @@ module.exports = {
       try {
         let user = await pool.execute('update users set nickname = ?, last_updated_ip = ? WHERE member_id = ?', [data.nickname, data.ip, data.member_id])
         const [result] = await pool.query('select member_id, username, nickname, gender, created_at from users where member_id = ?', [data.member_id])
-        const token = await UserHelper.claimAccessTokenByMemberId(member_id)
-        return res.status(200).json({ result, token })
+        const AccessToken = await UserHelper.claimAccessTokenByMemberId(member_id)
+        return res.status(200).json({ result, AccessToken })
       } catch (err) {
         console.log(err)
         res.status(503).json({ 'result': 'error' })
