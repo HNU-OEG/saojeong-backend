@@ -4,6 +4,8 @@ const pool = require('../../../config/db')
 const jwt = require('jsonwebtoken')
 const randToken = require('rand-token')
 const S3Helper = require('../../../Helper/S3Helper')
+const moment = require('moment')
+moment.locale('ko')
 const StoreHelper = require('../../../Helper/StoreHelper')
 
 module.exports = {
@@ -158,15 +160,10 @@ module.exports = {
 
         if (!user == false) { //사용자가 사용가능하면
           let pl = jwt.verify(access_token, process.env.JWT_SECRET)
-
           let userinfo = await UserHelper.getUserInfo(pl.member_id)
-          console.log('USERINFO ===> ', userinfo)
-          // FIXME: 날짜가 1970년일리가없어!!!
-          var expirationDate = new Date(pl.exp)
-          console.log('expirationDate :>> ', expirationDate)
-          console.log('만료까지 ', Math.floor(expirationDate - (new Date() / 1000)), '초 남음.')
-          console.log('pl :>> ', pl)
-          if ((expirationDate - new Date()) > 60000) {
+          var expirationDate = moment.unix(pl.exp)
+          let expiry_seconds = (expirationDate - Date.now()) / 1000
+          if (expiry_seconds > 3600) {
             return res.status(200).json({ 'AccessToken': access_token })
           } else {
             let refreshPayload = {
@@ -196,7 +193,7 @@ module.exports = {
         let claim_refreshtoken = await UserHelper.claimJWTRefreshToken(member_id, refresh_token) //사용자 oauth refresh토큰 발급
         console.log(claim_accessToken, claim_refreshtoken)
         if (!claim_refreshtoken == 0) {
-          return res.status(201).json({ 'member_id': member_id, 'accessToken': claim_accessToken, 'refreshToken': claim_refreshtoken })
+          return res.status(201).json({ 'member_id': member_id, 'AccessToken': claim_accessToken, 'RefreshToken': claim_refreshtoken })
         }
         // Refresh Token이 더이상 사용할 수 없을 때
         return res.status(401).json({ 'result': 'error', 'message': '이 Refresh Token은 사용할 수 없습니다. 로그인을 다시 시도해주세요.' })

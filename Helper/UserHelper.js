@@ -37,11 +37,9 @@ module.exports = {
     // FIXME: CHANGE TOKEN EXPIRY IN PRODUCTION!!!!!!!
     let base_payload = {
       iss: 'team.Ojeongdong.Economics.Guardians',
-      exp: Math.floor(Date.now() / 1000) + 1296000,
+      exp: Math.floor(Date.now() / 1000) + 21600, // 6시간으로 설정
       ...payload,
     }
-
-    console.log(base_payload)
 
     try {
       let result = await jwt.sign(JSON.stringify(base_payload), process.env.JWT_SECRET)
