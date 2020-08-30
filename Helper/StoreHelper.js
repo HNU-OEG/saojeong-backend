@@ -95,9 +95,9 @@ module.exports = {
           "kindness_average": 0,
           "merchandise_average": 0,
           "price_average": 0,
-          "my_kindness": 0,
-          "my_merchandise": 0,
-          "my_price": 0
+          "my_kindness": -1,
+          "my_merchandise": -1,
+          "my_price": -1
         },
       }
 
@@ -578,9 +578,11 @@ module.exports = {
         WHERE so.question1 IS NOT NULL \
         GROUP BY si.store_id"
       )
+
       let sql = "UPDATE store_information si JOIN ("
       let array = []
       let i = 0;
+
       for (let row in score) {
         let id = score[row]["store_id"]
         let question1 = score[row]["question1"]
@@ -597,14 +599,15 @@ module.exports = {
 
       sql += array.join(" UNION ALL ")
       sql += ") vals ON si.store_id = vals.store_id SET si.question1_average = vals.question1_average, si.question2_average = vals.question2_average, si.question3_average = vals.question3_average, si.vote_grade_average = vals.average"
+      let [result] = await pool.execute(sql)
 
-      let [result] = pool.execute(sql)
-      console.log("평점 취합 SQL", sql)
-      console("평점 취합 완료", result)
-      console.log("평점 취합 완료 시간", new Date())
+      console.log("평점 취합 SQL: ", sql)
+      console.log("평점 취합 완료: ", result)
+      console.log("평점 취합 완료 시간: ", new Date())
     } catch (e) {
       console.log("평점 취합 중 오류 발생", e)
       throw new Error("평점 취합 중 오류 발생", e)
     }
-  })
+  }),
 }
+
