@@ -31,9 +31,9 @@ module.exports = {
     let member_id = data.member_id
     try {
       let [storeList] = await pool.query(
-        'SELECT si.store_id, si.store_indexholder AS store_number, \
-        si.store_name, si.vote_grade_average, si.store_image, \
-        si.vote_grade_count, 1 AS `starred` \
+        'SELECT DISTINCT si.store_id, si.store_indexholder AS store_number, \
+          si.store_name, si.vote_grade_average, si.store_image, \
+          si.vote_grade_count, 1 AS `starred` \
         FROM store_information AS si, starred_store AS ss \
         WHERE ss.store_id = si.store_id AND ss.member_id = ? \
         AND ss.is_visible = 1 AND si.is_visible = 1', [member_id])
@@ -66,10 +66,10 @@ module.exports = {
           IF (ss.store_id IS NOT NULL, TRUE, FALSE) AS starred \
         FROM `store_information` AS si \
         LEFT JOIN `starred_store` AS ss \
-        ON si.store_id = ss.store_id AND ss.is_visible = 1  \
+        ON si.store_id = ss.store_id AND member_id = ? AND ss.is_visible = 1  \
         LEFT JOIN `store_telephone` AS st \
         ON si.store_id = st.store_id AND st.is_visible = 1  \
-        WHERE si.store_id = ?', [store_id]
+        WHERE si.store_id = ?', [member_id, store_id]
       )
 
       let [opening] = await pool.query(
@@ -119,16 +119,14 @@ module.exports = {
     try {
       let storeList = await pool.query(
         'SELECT \
-          `store_indexholder` AS `store_number`, store_image, \
-          `store_name`, `vote_grade_average`, \
-          `vote_grade_count`, `store_id`, \
-          IF\
-          ((SELECT `created_at` FROM `starred_store` AS ss \
-          WHERE `member_id` = ? AND `ss`.`store_id` = `si`.`store_id` AND `is_visible` = 1 LIMIT 1) \
-          IS NOT NULL, TRUE, FALSE) AS `starred` \
-        FROM `store_information` AS `si` \
-        WHERE `is_visible` = 1 \
-        ORDER BY `vote_grade_average` DESC', [member_id])
+        si.`store_indexholder` AS `store_number`, si.store_image, \
+        si.`store_name`, si.`vote_grade_average`, \
+        si.`vote_grade_count`, si.`store_id`, \
+        IF(ss.store_id IS NOT NULL, TRUE, FALSE) AS `starred` \
+      FROM `store_information` AS `si` \
+      LEFT JOIN starred_store ss ON si.store_id = ss.store_id AND ss.member_id = ? AND ss.is_visible = 1 \
+      WHERE si.`is_visible` = 1 \
+      ORDER BY `vote_grade_average` DESC', [member_id])
 
       console.log('평점순 점포 리스트 조회 완료: ', storeList[0])
       return storeList
