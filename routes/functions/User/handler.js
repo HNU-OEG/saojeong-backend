@@ -6,6 +6,8 @@ const randToken = require('rand-token')
 const S3Helper = require('../../../Helper/S3Helper')
 const moment = require('moment')
 moment.locale('ko')
+const StoreHelper = require('../../../Helper/StoreHelper')
+
 module.exports = {
   ClaimNewGuestUser: async (req, res, next) => {
     let nickname = await UserHelper.generateGuestNickname()

@@ -1,6 +1,8 @@
 const faker = require('faker/locale/ko')
 const pool = require('../config/db')
 const weekday = { 'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4, 'sat': 5, 'sun': 6 }
+const cron = require('node-cron')
+const { set } = require('lodash')
 
 module.exports = {
   readAllVotedStore: async (data) => {
@@ -93,9 +95,9 @@ module.exports = {
           "kindness_average": 0,
           "merchandise_average": 0,
           "price_average": 0,
-          "my_kindness": 0,
-          "my_merchandise": 0,
-          "my_price": 0
+          "my_kindness": -1,
+          "my_merchandise": -1,
+          "my_price": -1
         },
       }
 
@@ -563,6 +565,49 @@ module.exports = {
       res.status(503).send(e)
       throw new Error('상품 등록 중 오류 발생')
     }
-
   },
+  // calculateGrade: cron.schedule('', () => {
+
+  // })
+  calculateGrade: cron.schedule("* 4 * * *", async () => {
+    try {
+      let [score] = await pool.query(
+        "SELECT si.store_id, FORMAT(avg(so.question1), 1) AS question1, FORMAT(avg(so.question2), 1) AS question2, FORMAT(avg(so.question3), 1) AS question3, FORMAT((so.question1 + so.question2 + so.question3)/3, 1) AS average\
+        FROM store_information si  \
+        LEFT JOIN store_vote_grade so ON si.store_id = so.store_id  AND is_available = 1 \
+        WHERE so.question1 IS NOT NULL \
+        GROUP BY si.store_id"
+      )
+
+      let sql = "UPDATE store_information si JOIN ("
+      let array = []
+      let i = 0;
+
+      for (let row in score) {
+        let id = score[row]["store_id"]
+        let question1 = score[row]["question1"]
+        let question2 = score[row]["question2"]
+        let question3 = score[row]["question3"]
+        let average = score[row]["average"]
+        if (i === 0) {
+          array.push("SELECT " + id + " as store_id, " + question1 + " as question1_average, " + question2 + " as question2_average, " + question3 + " as question3_average, " + average + " as average")
+        } else {
+          array.push("SELECT " + id + ", " + question1 + ", " + question2 + ", " + question3 + ", " + average)
+        }
+        ++i;
+      }
+
+      sql += array.join(" UNION ALL ")
+      sql += ") vals ON si.store_id = vals.store_id SET si.question1_average = vals.question1_average, si.question2_average = vals.question2_average, si.question3_average = vals.question3_average, si.vote_grade_average = vals.average"
+      let [result] = await pool.execute(sql)
+
+      console.log("평점 취합 SQL: ", sql)
+      console.log("평점 취합 완료: ", result)
+      console.log("평점 취합 완료 시간: ", new Date())
+    } catch (e) {
+      console.log("평점 취합 중 오류 발생", e)
+      throw new Error("평점 취합 중 오류 발생", e)
+    }
+  }),
 }
+
