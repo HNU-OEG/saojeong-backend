@@ -9,7 +9,7 @@ module.exports = {
     let member_id = data.member_id
     try {
       let [storeList] = await pool.query(
-        'SELECT si.store_indexholder AS store_number, \
+        'SELECT DISTINCT si.store_indexholder AS store_number, \
         si.store_name, si.vote_grade_average, si.store_image \
         FROM `store_information` AS si, `store_vote_grade` AS vg \
         WHERE si.store_id = vg.store_id AND vg.member_id = ? \
