@@ -26,9 +26,9 @@ module.exports = {
       ipaddr: ipaddr
     }
 
+    const [user] = await pool.execute('insert into users (member_id, username, nickname, gender, type, enabled, last_updated_ip) values (?,?,?,?,?,?,?)', [data.id, data.username, data.nickname, data.gender, data.type, data.enabled, data.ipaddr])
     try {
-      const user = await pool.execute('insert into users (member_id, username, nickname, gender, type, enabled, last_updated_ip) values (?,?,?,?,?,?,?)', [data.id, data.username, data.nickname, data.gender, data.type, data.enabled, data.ipaddr])
-      const [result] = await pool.query('select id, member_id, username, nickname, gender, created_at, type from users where id=last_insert_id()')
+      const [result] = await pool.query('select id, member_id, username, nickname, gender, created_at, type from users where id=?', [user.insertId])
       let jwtpayload_data = {
         reference_id: result[0].id,
         member_id: result[0].member_id,
@@ -150,6 +150,7 @@ module.exports = {
     let member_id = jwt.decode(access_token).member_id
     let refresh_token = req.body.RefreshToken
 
+    console.log(member_id, access_token, refresh_token)
     try {
       let user_status = await UserHelper.checkUserStatus(member_id)
 
