@@ -1,0 +1,66 @@
+name: Deploy to Development 
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    name: Build, Deploy to S3 bucket
+    env:
+      PROJECT_NAME: saojeong-backend
+    runs-on: [ubuntu-latest]
+
+    strategy:
+      matrix:
+        node-version: [12.16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Cache node modules      # node modules 캐싱
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+            
+      - name: "Configure AWS Credentials"
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          # AWS Access Key ID. This input is required if running in the GitHub hosted environment. It is optional if running in a self-hosted environment that already has AWS credentials, for example on an EC2 instance.
+          aws-access-key-id: ${{ secrets.AWS_DEPLOYMENT_USER_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_DEPLOYMENT_USER_SECRET }}
+          aws-region: ap-northeast-2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Npm install
+        run: |
+          rm package-lock.json
+          npm install --package-lock
+          npm ci
+        
+      - name: Make tar file
+        run: |
+          tar -cvf ./$GITHUB_SHA.tar . && mv ./$GITHUB_SHA.tar dist
+        continue-on-error: true
+        
+      - name: Transfer to S3 for serving static
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: 'hnulinc3-deploy'
+          aws-access-key-id: ${{ secrets.AWS_DEPLOYMENT_USER_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_DEPLOYMENT_USER_SECRET }}
+          AWS_REGION: 'ap-northeast-2'
+          SOURCE_DIR: 'dist'
+          
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name saojeong-service --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name saojeong-deployment --s3-location bucket=hnulinc3-deploy,bundleType=tar,key=$GITHUB_SHA.tar
