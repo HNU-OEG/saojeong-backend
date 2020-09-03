@@ -123,20 +123,26 @@ module.exports = {
   readAllFreeBoardContents: async (data) => {
     try {
       let [contentOrderByCreated] = await pool.query(
-        'SELECT b.document_id,b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
-        FROM board_contents AS b, users AS u \
-        WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 \
+        'SELECT b.document_id,b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.voted_count, ifnull(count(comment_id),0) AS comment_count \
+        FROM board_contents AS `b` \
+        JOIN `users` AS u ON u.`member_id` = b.member_id \
+        LEFT OUTER JOIN `board_comments` AS bc ON bc.document_id = b.document_id \
+        WHERE b.member_id = u.member_id AND b.is_visible = 1 AND b.board_category = 10004 \
+        GROUP BY b.document_id \
         ORDER BY b.created_at DESC', [data.category]
       )
 
       let [contentOrderByVoted] = await pool.query(
-        'SELECT b.document_id,b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.comment_count, b.voted_count \
-        FROM board_contents AS b, users AS u \
-        WHERE b.member_id = u.member_id AND b.board_category = ? AND b.is_visible = 1 AND b.voted_count > 0 \
+        'SELECT b.document_id,b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, ifnull(count(comment_id),0) AS comment_count, b.voted_count \
+        FROM board_contents AS b \
+        JOIN `users` AS u ON u.`member_id` = b.member_id \
+        LEFT OUTER JOIN `board_comments` AS bc ON bc.document_id = b.document_id \
+        WHERE b.board_category = ? AND b.is_visible = 1 AND b.voted_count > 0 \
+        GROUP BY b.document_id \
         ORDER BY b.voted_count DESC LIMIT 2', [data.category]
       )
 
-      let response = { normal: contentOrderByCreated, hot: contentOrderByVoted, }
+      let response = { normal: contentOrderByCreated, hot: contentOrderByVoted }
       console.log('자유게시판 조회 완료: ', response)
       return response
     } catch (e) {
