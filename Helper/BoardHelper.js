@@ -159,7 +159,7 @@ module.exports = {
       )
 
       console.log('공지사항 전체 조회 완료: ', response)
-      return response
+      return { normal: response }
     } catch (e) {
       throw new Error('공지사항 전체 조회 중 오류 발생: ', e)
     }
