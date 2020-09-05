@@ -271,7 +271,7 @@ module.exports = {
         if (result.length == 0) {
           return res.status(200).json({ 'result': '조건에 맞는 결과가 없습니다.' })
         }
-        return res.status(200).json({ result: result })
+        return res.status(200).json({ normal: result })
       } catch (err) {
         throw new Error('게시판을 검색할 수 없습니다.')
       }
