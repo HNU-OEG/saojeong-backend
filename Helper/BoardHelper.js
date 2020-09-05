@@ -127,7 +127,7 @@ module.exports = {
         FROM board_contents AS `b` \
         JOIN `users` AS u ON u.`member_id` = b.member_id \
         LEFT OUTER JOIN `board_comments` AS bc ON bc.document_id = b.document_id \
-        WHERE b.member_id = u.member_id AND b.is_visible = 1 AND b.board_category = 10004 \
+        WHERE b.member_id = u.member_id AND b.is_visible = 1 AND b.board_category = ? \
         GROUP BY b.document_id \
         ORDER BY b.created_at DESC', [data.category]
       )
