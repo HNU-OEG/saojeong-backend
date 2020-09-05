@@ -17,12 +17,10 @@ module.exports = {
         LEFT OUTER JOIN `board_comments` AS bc ON bc.document_id = b.document_id \
         WHERE b.member_id = u.member_id AND b.is_visible = 1 AND b.board_category = ? AND b.member_id = ? \
         GROUP BY b.document_id \
-        ORDER BY b.created_at DESC', [member_id, category]
+        ORDER BY b.created_at DESC', [category, member_id]
       )
 
-      console.log(myContent)
-
-      let response = { normal: myContent, }
+      let response = { normal: myContent }
       console.log('내 게시물 조회 완료: ', response)
       return response
     } catch (e) {
