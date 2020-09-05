@@ -20,6 +20,8 @@ module.exports = {
         ORDER BY b.created_at DESC', [member_id, category]
       )
 
+      console.log(myContent)
+
       let response = { normal: myContent, }
       console.log('내 게시물 조회 완료: ', response)
       return response
@@ -29,7 +31,7 @@ module.exports = {
   },
   getReadMyBoardContentDto: async (req) => {
     return {
-      "member_id": req.params.member_id,
+      "member_id": req.user.member_id,
       "category": req.params.category,
     }
   },
