@@ -5,6 +5,34 @@ const { title } = require('faker/lib/locales/ko')
 
 
 module.exports = {
+  readMyBoardContent: async (data) => {
+    let member_id = data.member_id
+    let category = data.category
+
+    try {
+      let [myContent] = await pool.query(
+        'SELECT b.document_id,b.title, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.voted_count, ifnull(count(comment_id),0) AS comment_count \
+        FROM board_contents AS `b` \
+        JOIN `users` AS u ON u.`member_id` = b.member_id \
+        LEFT OUTER JOIN `board_comments` AS bc ON bc.document_id = b.document_id \
+        WHERE b.member_id = u.member_id AND b.is_visible = 1 AND b.board_category = ? AND b.member_id = ? \
+        GROUP BY b.document_id \
+        ORDER BY b.created_at DESC', [member_id, category]
+      )
+
+      let response = { normal: myContent, }
+      console.log('내 게시물 조회 완료: ', response)
+      return response
+    } catch (e) {
+      throw new Error('내 게시물 조회 중 오류 발생: ', e)
+    }
+  },
+  getReadMyBoardContentDto: async (req) => {
+    return {
+      "member_id": req.params.member_id,
+      "category": req.params.category,
+    }
+  },
   // CheckUsername:
   CreateBoard: async (req, res, next) => {
     /**

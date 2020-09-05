@@ -24,6 +24,16 @@ module.exports = {
       .then(result => res.status(201).json(result))
       .catch(err => res.status(503).send(err))
   },
+  ReadMyFreeContent: async (req, res, next) => {
+    /**
+     * URI: [GET, /api/board/:category/content/my]
+     */
+    let data = await BoardHelper.getReadMyBoardContentDto(req)
+    let myContent = BoardHelper.readMyBoardContent(data)
+    myContent
+      .then(result => res.status(201).json(result))
+      .catch(err => res.status(503).send(err))
+  },
   ReadBoardContent: async (req, res, next) => {
     /**
      * URI: [GET, /api/board/:category/content/:documentId]
