@@ -251,16 +251,23 @@ module.exports = {
   SearchBoard: async (req, res, next) => {
     let type = req.query.type
     let query = req.query.value
+    let category = req.query.category
 
     if (query.length <= 2) {
       return res.status(200).json({ 'result': '검색어는 최소 3자리부터 입력해야 합니다.' })
     }
 
-    let variable = '%${query}%'
+    let variable = `%${query}%`
 
     if (type == 'board') {
       try {
-        let [result] = await pool.query('SELECT board_contents.title, board_contents.content, board_contents.created_at FROM boards, board_contents, board_comments WHERE boards.board_id = board_contents.board_category AND board_contents.document_id = board_comments.`document_id` AND (board_contents.content LIKE ? OR board_comments.`comment_content` LIKE ?) GROUP BY board_contents.document_id', [variable, variable])
+        let [result] = await pool.query('SELECT b.document_id, b.title, b.`content`, u.nickname AS author, DATE_FORMAT(b.created_at, \'%m.%d %H:%i\') AS created_at, b.voted_count, ifnull(count(comment_id),0) AS comment_count \
+        FROM board_contents AS `b` \
+        JOIN `users` AS u ON u.`member_id` = b.member_id \
+        LEFT OUTER JOIN `board_comments` AS bc ON bc.document_id = b.document_id \
+        WHERE b.member_id = u.member_id AND b.is_visible = 1 AND b.board_category = ? AND b.content LIKE ? \
+        GROUP BY b.document_id \
+        ORDER BY b.created_at DESC', [category, variable])
         if (result.length == 0) {
           return res.status(200).json({ 'result': '조건에 맞는 결과가 없습니다.' })
         }
