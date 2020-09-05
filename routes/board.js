@@ -10,7 +10,7 @@ router.post('/', BoardHelper.CreateBoard)
 
 // 게시글 관련
 router.get('/:category/content/my', BoardHandler.ReadMyContent)
-router.get('/:category/content/user/:member_id', BoardHandler.ReadMyFreeContent)
+router.get('/:category/content/user', BoardHandler.ReadMyFreeContent)
 router.get('/:category/content', BoardHandler.ReadAllBoardContents)
 router.get('/:category/content/:documentId', BoardHandler.ReadBoardContent)
 router.post('/:category/content', BoardHandler.PostNewBoardContent)
