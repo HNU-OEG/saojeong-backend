@@ -39,7 +39,7 @@ module.exports = {
     // FIXME: CHANGE TOKEN EXPIRY IN PRODUCTION!!!!!!!
     let base_payload = {
       iss: 'team.Ojeongdong.Economics.Guardians',
-      exp: Math.floor(Date.now() / 1000) + 21600, // 6시간으로 설정
+      exp: Math.floor(Date.now() / 1000) + 360, // 360초(6분) 으로 설정
       ...payload,
     }
 
